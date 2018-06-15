@@ -55,11 +55,13 @@ module.exports = (options = {}) => ({
     extensions: ['.js', '.vue', '.json', '.css']
   },
   devServer: {
-    host: '127.0.0.1',
+    host: '10.42.1.247',
+    //host: '192.168.31.133',
     port: 8010,
     proxy: {
       '/api/': {
-        target: 'http://127.0.0.1:8080',
+        //target: 'http://192.168.31.133:8080',
+        target: 'http://10.42.1.247:8080',
         changeOrigin: true,
         pathRewrite: {
           '^/api': ''

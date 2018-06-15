@@ -9,7 +9,10 @@
   },
   "dependencies": {
     "element-ui": "^2.3.4",
-    "vue": "^2.5.16"
+    "jquery": "^3.3.1",
+    "node-static": "^0.7.10",
+    "vue": "^2.5.16",
+    "vue-socket.io": "^2.1.1-b"
   },
   "engines": {
     "node": ">=6"
@@ -27,6 +30,7 @@
     "style-loader": "^0.13.2",
     "url-loader": "^0.5.8",
     "vue-loader": "^13.3.0",
+    "vue-router": "^3.0.1",
     "vue-template-compiler": "^2.5.16",
     "webpack": "^2.4.1",
     "webpack-dev-server": "^2.4.2"
