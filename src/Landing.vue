@@ -102,16 +102,18 @@ if(isconn) {
       {},
       function connectCallback(frame){
 
+        //stompClient.send("/app/sendTest",{},JSON.stringify({ "name": "456" }));
 
-        stompClient.send("/app/sendTest",{},JSON.stringify({ "name": "456" }));
-
-        stompClient.subscribe("/app/topic/subscribeSSH", function(response){
+        stompClient.subscribe("/app/subscribeSSH", function(response){
           console.log("[ok] subscribe successful");
-          console.log("[data]"+ response.body);
+          console.log("[data]"+ response.body); 
 
+         stompClient.subscribe("/app/topic/subscribeSSH", function(response){
+            
+              console.log("[2]"+response.body);
+
+          });
           //stompClient.send("/app/sendTest",{},JSON.stringify({ "name": "123" }));
-
-
         })
       },
       function errorCallback(error) {
