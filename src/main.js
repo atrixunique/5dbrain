@@ -1,13 +1,13 @@
 import Vue from 'vue'
 import ElementUI from 'element-ui'
-import 'element-ui/lib/theme-chalk/index.css'
-
 import vueRouter from  'vue-router'
 import VueResource from 'vue-resource'
 
+import 'element-ui/lib/theme-chalk/index.css'
+
 //Pages
-//import App from './App.vue'
 import Landing from './Landing.vue'
+import VImage from './VImage.vue'
 
 
 Vue.use(ElementUI, {size:'small'})
@@ -18,9 +18,18 @@ const router = new vueRouter({
   mode: 'history',
   base: __dirname,
   routes: [
-    // 动态路径参数 以冒号开头
-    { path: '/portal', component: resolve => require(['./portal.vue'], resolve) }
+    { path: '/', component: resolve => require(['./VDashboard.vue'], resolve), meta:{mid:0} },
+    { path: '/Container', component: resolve => require(['./VContainer.vue'], resolve), meta: {mid: 1 } },
+    { path: '/Image', component: resolve => require(['./VImage.vue'], resolve), meta: { mid: 2 } }
   ]
+})
+
+Vue.component('msg', {
+  functional: true,
+  render: (createElement, context) => {
+    return createElement('div', context.props.message)
+  },
+  props: ['message']
 })
 
 new Vue({
