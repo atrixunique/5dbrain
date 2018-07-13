@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <el-container>
-      <el-header id="navbar"><span>Time 16:03:27</span></el-header>
+      <el-header id="navbar"><span>Time 16:03:28</span></el-header>
       <el-main>
         <el-container style="height:1005px">
           <el-aside style="width:338px;">
@@ -24,15 +24,20 @@
             <div style="bottom:0px;">Route</div>
 
           </el-aside>
+
+
           <!-- The main area to display-->
+          <!-- *********************** -->
           <router-view>
             
           </router-view>
-      
+          <!-- Main area ends -->
+
+
         </el-container>
 
       </el-main>
-      <footer>This is footer</footer>
+      <footer>Footer</footer>
       
     </el-container>
     <div id="cstklc">
@@ -50,7 +55,7 @@
 import Vue from 'vue'
 var sockJS= require('./assets/js/sockjs.min.js')
 var Stomp = require("./assets/js/stomp.min.js").Stomp
-var isconn= true
+var isconn= false
 //var Stomp=window.Stomp
 //debugger;
 

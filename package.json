@@ -8,8 +8,10 @@
     "build": "rimraf dist && webpack -p --progress --hide-modules"
   },
   "dependencies": {
+    "axios": "^0.18.0",
     "element-ui": "^2.3.4",
     "jquery": "^3.3.1",
+    "mockjs": "^1.0.1-beta3",
     "node-static": "^0.7.10",
     "node-stomp-protocol": "^0.3.6",
     "nodejs-websocket": "^1.7.1",

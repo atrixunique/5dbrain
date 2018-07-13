@@ -7,8 +7,6 @@ import 'element-ui/lib/theme-chalk/index.css'
 
 //Pages
 import Landing from './Landing.vue'
-import VImage from './VImage.vue'
-
 
 Vue.use(ElementUI, {size:'small'})
 Vue.use(vueRouter)
