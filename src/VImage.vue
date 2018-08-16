@@ -219,6 +219,7 @@ export default {
     mounted() {
         var self=this;
         mockAll();
+        
         //create Image list
         console.log('[mounted] enter here');
         axios.get(getServiceIP()+"getImageList").then(function(response){    
@@ -293,7 +294,7 @@ export default {
 .el-tooltip__popper.is-light {
     color:black;
     font-family:微软雅黑;}
-
+.el-table--border::after, .el-table--group::after, .el-table::before { background-color: transparent !important;}
 .el-table tr, .el-table th, .cell {
   background-color: transparent !important;
   color:#bde8ff;

@@ -87,6 +87,82 @@ function mockAll()
             }
         ] 
     });
+    Mock.mock(getServiceIP() + "/cluster/list", {
+        result: [{
+                domain: "xbrain-1",
+                ip:"10.42.0.133",
+                containers:"1/1",
+                images:"2"
+            },
+            {
+                domain: "xbrain-2",
+                ip: "10.42.0.131",
+                containers: "0/2",
+                images: "3"
+            },
+            {
+                domain: "xbrain-3",
+                ip: "10.42.0.135",
+                containers: "1/3",
+                images: "1"
+            }
+        ]
+    });
+    Mock.mock(getServiceIP() + "/docker/listcontainer", {
+        result: {
+            status:"success",
+            message: "成功获取容器名称",
+            container: [
+                {
+                    Id: "001",
+                    Names: ["/suspicious_kowalevski"],
+                    Labels: {},
+                    Command: "/usr/bin/sh",
+                    ImageID: "sha256:fw",
+                    State: "is-stopped"
+                },
+                {
+                    Id: "002",
+                    Names: ["/sad_meninsky"],
+                    Labels: {},
+                    Command: "/usr/bin/sh",
+                    ImageID: "sha256:hp",
+                    State: "is-running"
+                },
+                {
+                    Id: "003",
+                    Names: ["/sad_meninsky"],
+                    Labels: {},
+                    Command: "/usr/bin/sh",
+                    ImageID: "sha256:dao",
+                    State: "is-running"
+                }
+
+            ]
+
+        }
+    });
+
+    Mock.mock(getServiceIP() + "/action/listimages", {
+        "repositories": [
+            {
+                tags: [
+                    "v1"
+                ],
+                "name": "10.42.0.220：5000/httpd"
+            },
+            {
+                tags: [
+                    "1.0",
+                    "v2",
+                    "latest"
+                ],
+                "name": "10.42.0.220：5000/pot"
+            }
+        ]
+    });
+
+
 
 }
 
