@@ -4,6 +4,12 @@ function getServiceIP()
 {
     return 'http://10.42.0.85:8080/';
 }
+
+function getRealIP()
+{
+    
+}
+
 function mockAll()
 {
     Mock.mock(getServiceIP() + "getImageList", {
@@ -142,6 +148,58 @@ function mockAll()
 
         }
     });
+    Mock.mock(getServiceIP() + "/docker/listcontainer2", {
+        result: {
+            status: "success",
+            message: "成功获取容器名称",
+            container: [
+                {
+                    Id: "Black",
+                    Names: ["/suspicious_kowalevski"],
+                    Labels: {},
+                    Command: "/usr/bin/sh",
+                    ImageID: "sha256:fw",
+                    State: "is-stopped"
+                },
+                {
+                    Id: "Board",
+                    Names: ["/sad_meninsky"],
+                    Labels: {},
+                    Command: "/usr/bin/sh",
+                    ImageID: "sha256:hp",
+                    State: "is-running"
+                }
+
+            ]
+
+        }
+    });
+    Mock.mock(getServiceIP() + "/docker/listimage", {
+        result: {
+            status: "success",
+            message: "成功获取镜像名称",
+            images: [
+                {
+                    Id: "image01",
+                    Names: ["/suspicious_kowalevski"],
+                    Labels: {},
+                    Command: "/usr/bin/sh",
+                    ImageID: "sha256:fw",
+                    RepoTags: []
+                },
+                {
+                    Id: "image02",
+                    Names: ["/sad_meninsky"],
+                    Labels: {},
+                    Command: "/usr/bin/sh",
+                    ImageID: "sha256:hp",
+                    RepoTags: []
+                }
+
+            ]
+
+        }
+    });
 
     Mock.mock(getServiceIP() + "/action/listimages", {
         "repositories": [
@@ -169,4 +227,5 @@ function mockAll()
 export{
     mockAll,
     getServiceIP,
+    getRealIP
 }

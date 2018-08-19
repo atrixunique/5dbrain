@@ -6,9 +6,11 @@ import VueResource from 'vue-resource'
 import 'element-ui/lib/theme-chalk/index.css'
 
 //Pages
-import Landing from './Landing.vue'
 
-Vue.use(ElementUI, {size:'small'})
+import Landing from './Landing.vue'
+import Entrance from './Entrance.vue'
+
+Vue.use(ElementUI, { size: 'small' })
 Vue.use(vueRouter)
 Vue.use(VueResource)
 
@@ -16,9 +18,13 @@ const router = new vueRouter({
   mode: 'history',
   base: __dirname,
   routes: [
-    { path: '/', component: resolve => require(['./VDashboard.vue'], resolve), meta:{mid:0} },
-    { path: '/Container', component: resolve => require(['./VContainer.vue'], resolve), meta: {mid: 1 } },
-    { path: '/Image', component: resolve => require(['./VImage.vue'], resolve), meta: { mid: 2 } }
+    { path: '/', component: resolve => require(['./VDashboard.vue'], resolve), meta: { mid: 0 } },
+    { path: '/Dashboard', component: resolve => require(['./VDashboard.vue'], resolve), meta: { mid: 1 } },
+    { path: '/Container', component: resolve => require(['./VContainer.vue'], resolve), meta: { mid: 2 } },
+    { path: '/Image', component: resolve => require(['./VImage.vue'], resolve), meta: { mid: 3 } },
+    { path: '/Info', component: resolve => require(['./VInfo.vue'], resolve), meta: { mid: 4 } },
+    { path: '/Decision', component: resolve => require(['./VDecision.vue'], resolve), meta: { mid: 5 } },
+    { path: '/System', component: resolve => require(['./VSystem.vue'], resolve), meta: { mid: 6 } }
   ]
 })
 
@@ -33,7 +39,10 @@ Vue.component('msg', {
 new Vue({
   el: '#app',
   router,
-  render: h => h(Landing)
+  render: h => h(Landing),
+  data: {
+    eventHub: new Vue()
+  }
 })
 
 Date.prototype.toLocaleString = function (fmt) {

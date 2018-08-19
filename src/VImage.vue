@@ -1,155 +1,211 @@
 <template>
     <el-main>
-        <div class="asideimage" :style ="asideimage">
+        <el-dialog title="拉取镜像" :visible.sync="dialogPullImageVisible" width="30%">
+            <el-form :model="formPullImage" style="text-align:left">
+
+                <el-form-item label="目标节点：" :label-width="formLabelWidth">
+                    <el-select v-model="formPullImage.nodeName">
+                        <el-option v-for ="node in nodes" :label="node.domain" :key="'opn_'+node.domain" :value="node.domain" :selected="0"></el-option>
+                    </el-select>
+                </el-form-item>
+
+                <el-form-item label="镜像名：" :label-width="formLabelWidth">
+                    <el-select v-model="formPullImage.imageName" @change="changeImage">
+                        <el-option v-for ="image in sourceimages" :label="image.name" :key="'opi_'+image.name" :value="image.name"></el-option>
+                    </el-select>
+                </el-form-item>
+
+                <el-form-item label="版本：" :label-width="formLabelWidth">
+                    <el-select v-model="formPullImage.version">
+                        <el-option v-for ="version in versions" :label="version" :key="'opv_'+version" :value="version"></el-option>
+                    </el-select>
+                </el-form-item>
+
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+                <el-button @click="dialogPullImageVisible = false">取消</el-button>
+                <el-button type="primary" @click="addNewContainer">添加</el-button>
+            </div>
+        </el-dialog>
+
+         <div class="asideimage" :style ="asideimage">
             <div style="height:125px"></div>
-            <img src="./assets/images/new-image.png" width=340 style="cursor:pointer"/>
+           
 
-             <image-item v-for="(image, index) in images" class="blockimage" 
-                v-bind:id="'CO'+image.id"
-                :style="blockimage" 
-                :class="{activeimage: isActive(index)}"
-                :id="image.id" 
-                :name="image.name" 
-                :sha="image.sha" 
-                :size="image.size" 
-                :create="image.create"
-                :key="image.id"
+             <node-item v-for="(node, index) in nodes" class="blocknode" 
+                v-bind:id="'BO'+node.domain"
+                :style="blocknode" 
+                :domain="node.domain" 
+                :ip="node.ip" 
+                :containers="node.containers" 
+                :images="node.images" 
+                :key="node.domain"
                 @mouseover.native="setActive(index)"
-                @click.native="imageClick(image.name)">
-            </image-item>
-            <div>位于其它节点上的镜像</div>
-        </div>
+                @mouseout.native="unsetActive(index)"
+                @click.native="nodeClick(index, node.domain)"
+                >
+            </node-item>
 
-        <div class="detailimage" :style ="detailimage">
-        
-            <image-detail 
-                :body="attributes"
-                class="blockimagedetail"
-            >  
-            </image-detail>
-            
-        </div>
-        
-        <div class="ribbonimage" :style ="ribbonimage" style="text-align:left;width:800px">
-             <span style="position:relative;top:60px;left:40px;padding-right:120px;">镜像是一个只读的安全载荷容器模板，含有启动安全载荷容器所需的文件系统结构及其内容，因此是智能安全体系的基础资源。<br/>
-            Images are fundamental resource for intelligent security framework, existed as read-only securiity workload container template, which contains file system structure and contents necessary to boot the container,</span>
-        </div>
+            <div style="height:105px"></div>
 
-        <div class="tableimage" style="position:absolute;left:355px;top:305px;width:800px;height:220px;text-align:left;z-index:999">
-                <div>镜像布署情况：
-                    <el-button type="primary" icon="el-icon-plus">添加</el-button>
-                    <el-button type="primary" icon="el-icon-share">拉取</el-button>
-                    <el-button type="primary" icon="el-icon-delete">删除</el-button>
+            <div class="containercontainer" :style="containercontainer">
+                <div style="position:absolute;left:96px;top:20px;height:20px;width:230px;text-align:left">
+                    <span>节点IP:{{selectedIP}}</span>
                 </div>
+                <div style="position:absolute;left:84px;top:88px;height:20px;width:230px;text-align:left">
+                    <span>共{{selectedTotal}}镜像</span>
+                </div>
+
+                <!--- Display images on node -->
+                <div style="position:absolute;left:5px;top:135px;height:330px;width:320px;">
+                    <el-popover
+                        placement="bottom"
+                        width="80"
+                        height="60"
+                        trigger="hover"
+                        v-for="(image, index) in nodeimages" 
+                        :key="image.Id"
+                        >
+                        <el-button type='text' size="small" @click="viewImageDetail(index)">
+                            详情
+                        </el-button>
+                        <el-button type='text' size="small" @click="deleteContainer(index)">
+                            删除
+                        </el-button>
+
+                        <node-badge
+                                v-bind:id="'NB'+image.Id" 
+                                slot="reference"
+                                :name="image.Id" 
+                                :typeimg="getImageClass(image.RepoTags)"
+                                @click.native="viewImageDetail(index)"
+                                >
+                            </node-badge>
+                    </el-popover>
+                </div>
+
+            </div>
+
+            <div>
+                <img src="./assets/images/new-container.png" width=340 style="cursor:pointer" @click="dialogPullImageVisible=true"/>
+            </div>
+        </div>
+        <!-- Detail info listed for a certain container -->
+        <div id="detailDiv" class="detailimage" 
+            :style ="detailimage" 
+            >
+        </div>
+
+        <div class="ribbonimage" :style ="ribbonimage" style="text-align:left;">
+            <span style="position:relative;top:60px;left:40px;padding-right:140px;">镜像是一个只读的安全载荷容器模板，含有启动安全载荷容器所需的文件系统结构及其内容，因此是智能安全体系的基础资源。<br/>
+            <span style="font-size:80%;color:#999">Images are fundamental resource for intelligent security framework, existed as read-only securiity workload container template, which contains file system structure and contents necessary to boot the container.</span></span>
+        </div>
+
+
+        <div class="containerEntity" :style ="entitybackground">
+            <div style="position:absolute;width:440px;height:202px;left:159px;top:30px;overflow-x:hidden;overflow-y:auto">
                 <el-table
-                    :data="images"
-                    
+                    :data="sourceimages"
                     style="width: 100%;background-color:transparent !important;"
                     >
                     <el-table-column
-                        prop="id"
-                        label="ID"
-                        align="center"
-                        width="180">
-                    </el-table-column>
-                    <el-table-column
                         prop="name"
-                        label="NAME"
-                        align="center"
-                        width="180">
-                    </el-table-column>
-                    <el-table-column
-                        prop="sha"
-                        label="LABEL"
-                        align="center"
-                        width="180">
-                    </el-table-column>
-                    <el-table-column
-                        label="DISTRIBUTION"
+                        label="名称"
                         align="left"
-                        show-overflow-tooltip>
-                            <template slot-scope="scope">
-                                <i class="el-icon-time"></i>
-                                <span style="margin-left: 10px"><el-tag>{{scope.row.nodes}}</el-tag></span>
+                        width="185">
+                    </el-table-column>
+                    <el-table-column
+                        label="TAG"
+                        align="left"
+                        width="180">
+                        <template slot-scope="scope">
+                                <span v-for="version in scope.row.tags" style="margin-left: 5px">
+                                    <el-tag>{{version}}</el-tag>
+                                </span>
                             </template>
                     </el-table-column>
-            </el-table>
+                    <el-table-column
+                        label="ACITON"
+                        align="center"
+                        width="70">
+                            <template slot-scope="scope">
+                                <el-button type="text" icon="el-icon-download"
+                                @click="dialogPullImageVisible = true"                  
+                                ></el-button>
+                             </template>
+                    </el-table-column>
+                </el-table>
+            </div>
+                     
         </div>
-
-        <div class="divcanvas" style="position:absolute;top:300px;left:330px;z-index:0;width:1252px;height:750px;">
-              <img src="./assets/images/entity-container.png" width=1000 style="left:-30px;top:180px"/>
-            
-               <el-tooltip class="item" effect="light" :content="'我是'+image.name" placement="top" v-for="(image, index) in images" v-bind:key="'SI'+image.id">
-                    <img 
-                        src="./assets/images/single-image.png" 
-                        width=103
-                        class="isometric-icon"
-                        v-bind:class="{isometricglow:isActive(index)}"
-                        v-bind:style="computeLeft(index, 'image')"
-                        @mouseover="setActive(index)"
-                        />
-                </el-tooltip>
-               
-            
-               <div v-for="(image, index) in images"
+        <img v-for="(node, index) in nodes"
+            class="isometric-node" 
+            v-bind:id="'LN'+index"
+            v-bind:style="computeLeft(index ,'node')"
+            v-bind:class="{isometricglow:isActive(index)}"
+            src="./assets/images/big-node.png" 
+            width=180>
+        </img>
+        <div v-for="(node, index) in nodes"
                 class="isometric-div"
-                v-bind:id="'LB'+image.id"
+                v-bind:id="'LB'+index"
                 v-bind:style="computeLeft(index ,'label')"
-                > {{image.name}}
-                
+                > {{node.ip}}
                 </div>
-
-        </div>
-         <!--
-
-             :class="{isometricglow:isActive(index)}"
-
-
-        <canvas width="1252" height="750" id="myCanvas" style="position:absolute;top:300px;left:330px;z-index:0;" @mouseover="setActive" @mouseout="unsetActive">
-              
-               :top="(390-index*100*Math.cos(Math.PI/6*(-1)))+'px'"
-
-        </canvas>
-        -->
+        <div v-for="(node, index) in nodes"
+                class="isometric-div"
+                v-bind:id="'LB'+index"
+                v-bind:style="computeLeft(index ,'label',-10)"
+                > {{node.domain}}
+                </div>
+        
     </el-main>
 </template>
 
 <script>
-
 import Vue from 'vue';
 import Mock from 'mockjs';
 import axios from 'axios';
 
 import {getServiceIP, mockAll} from './mockdata.js';
+import {clog} from './commonfunc.js';
 
-Vue.component('image-item', {
+Vue.component('node-item', {
   data() {
     return {
     }
   },
-  props: ['id','name','sha','size','create','isActive'],
-  template: '<div><div class="d-id">ID:{{id}}</div><div class="d-table"><table><tr><td>名称:</td><td>{{name}}</td></tr><tr><td>SHA</td><td>{{sha}}</td></tr><tr><td>大小</td><td>{{size}}</td></tr><tr><td>创建时间</td><td>{{create}}</td></tr></table></div></div>'
+  props: ['domain','ip','containers','images'],
+  template: '<div><div class="d-domain">{{domain}}</div><div class="d-ip">{{ip}}</div><div class="d-containers">{{containers}}</div></div>'
 })
 
-Vue.component('image-detail', {
+Vue.component('node-badge', {
   data() {
     return {
     }
   },
-  props: ['body'],
-  template:'<div><div class="s-sid">镜像：{{body.id}}</div><div class="s-id">{{body.id}}</div><div class="s-label">{{body.label}}</div><div class="s-created">{{body.created}}</div><div class="s-architecture">{{body.architecture}}</div><div class="s-os">{{body.os}}</div><div class="s-size">{{body.size}}</div><div class="s-sha">{{body.sha}}</div><div class="s-cmd">{{body.cmd}}</div></div>'
+  props: ['name','typeimg','running'],
+  template: '<div class="badge-item" :style="typeimg"><span>{{name}}</span></div>'
 })
-
-//  props: ['id', 'sha', 'os', 'architecture', 'cmd', 'created', 'size', 'label'],
-//  template:'<div>详细信息列表<ol><li>id:{{id}}</li><li>sha:{{sha}}</li><li>os:{{os}}</li><li>镜像架构:{{architecture}}</li><li>cmd:{{cmd}}</li><li>created:{{created}}</li><li>size:{{size}}</li><li>label:{{label}}</li></ol></div>'
 
 export default {
     name: 'imagemgmt',
     data() {
         return {
-            images:[],
-            attributes:{},
-            activeImage:-1,
+            nodes:[],
+            nodeimages:[],
+            sourceimages:[],
+            formPullImage:{
+                nodeName:'',
+                imageName:'',
+                version:''
+            },
+            versions:[],
+            activeNode:-1,
+            selectedNode:-1,
+            selectedIP:'',
+            selectedTotal:0,
+            dialogPullImageVisible:false,
             asideimage: {
                 backgroundImage: "url("+require("./assets/images/aside-image.png") + ")",
                 position:"absolute",
@@ -159,10 +215,25 @@ export default {
                 height:"1000px",
                 paddingLeft:"4px"
             },
-            blockimage: {
-                backgroundImage: "url("+require("./assets/images/block-image.png") + ")",
+            blocknode: {
+                backgroundImage: "url("+require("./assets/images/block-node.png") + ")",
                 width:"340px",
-                height:"110px"
+                height:"60px"
+            },
+            entitybackground: {
+                backgroundImage: "url("+require("./assets/images/entity-image.png") + ")",
+                left:"280px",
+                top:"320px",
+                width:"1100px",
+                height:"668px"
+            },
+            ribbonimage: {
+                backgroundImage: "url("+require("./assets/images/ribbon-image.png") + ")",
+                position:"absolute",
+                left:"324px",
+                top:"158px",
+                width:"1257px",
+                height:"153px"
             },
             detailimage: {
                 backgroundImage: "url("+require("./assets/images/detail-image.png") + ")",
@@ -172,131 +243,237 @@ export default {
                 width:"340px",
                 height:"495px",
                 paddingLeft:"2px",
-                zIndex:"10"
+                zIndex:"10",
+                opacity:0
             },
-            ribbonimage: {
-                backgroundImage: "url("+require("./assets/images/ribbon-image.png") + ")",
-                position:"absolute",
-                left:"324px",
-                top:"158px",
-                width:"1257px",
-                height:"153px"
-            }
+            containercontainer: {
+                backgroundImage: "url("+require("./assets/images/container-container.png") + ")"
+            },
+            imagenullclass:{
+                backgroundImage: "url("+require("./assets/images/image-null.png") + ")"
+            },
+            formLabelWidth: '100px',
+            divShown:false
         }
      },
-    methods:{
-         imageClick:function(msg){
-            //debugger;
-            //alert(msg +' clicked!');
-            var self=this;
-            axios.get(getServiceIP()+"getImageDetail", {"name":msg}).then(function(response){
-                self.attributes=response.data.body;
-                
-             });
-        },
-        computeLeft:function(index, op){
+     methods:{
+        computeLeft:function(index, op, offset=0){
             
-            var step=125;
-            var startX=625, startY=380;
-            if(op=="label") {startX=655;startY=500;}
+            var step=150;
+            var startX=785, startY=520+offset;
+            if(op=="label") {startX=865;startY=659+offset;}
             
             var l=(startX-index*step*Math.cos(Math.PI/6.0))+'';
             var t=(startY+index*step*Math.sin(Math.PI/6.0))+'';
             return {left: l +'px', top: t+'px'}
         },
         setActive:function(index){
-            this.activeImage=index;
+            this.activeNode=index;
         },
         unsetActive:function(index){
-            this.activeImage=-1;
+            this.activeNode=-1;
         },
         isActive:function(index){
-            //console.log('checkactive:'+index);
-            if(this.activeImage==index) return true;
+            if(this.activeNode==index || this.selectedNode==index) return true;
             return false;       
-         }
-    },
-    mounted() {
-        var self=this;
-        mockAll();
-        
-        //create Image list
-        console.log('[mounted] enter here');
-        axios.get(getServiceIP()+"getImageList").then(function(response){    
-            //console.log(response);
-            self.images=response.data.body;
-            self.imageClick("001");
+        },
+        nodeClick:function(index, domain){
+            var self=this;
+            this.selectedNode=index;
+            self.selectedIP=self.nodes[self.selectedNode].ip;
+            self.selectedTotal=self.nodes[self.selectedNode].images;
 
-            axios.get(getServiceIP()+"getImageDeployed").then(function(response){    
-                
-                response.data.body.forEach((item, index) => {
-                    self.images[index].nodes=item.nodes;
-                });
+            axios.get(getServiceIP()+"/docker/listimage").then(function(response){    
+                self.nodeimages=response.data.result.images;
+                self.$root.eventHub.$emit('command-log', {text: "Select Node "+index, type: "info"});
+            });
+
+        },
+        changeImage:function()
+        {
+            var self=this;
+            //console.log("change image!");
+            for(var i=0;i<self.sourceimages.length;i++){
+                if(self.sourceimages[i].name == self.formPullImage.imageName) {
+                    self.versions=self.sourceimages[i].tags;
+                    if(self.versions.length) self.formPullImage.version=self.versions[0]; 
+                    break;
+                }
+            }
+        },
+        getImageClass:function(msg){
+            if(msg=="sha256:fw") return this.imagenullclass;
+            else if(msg=="sha256:hp") return this.imagenullclass;
+            else return this.imagenullclass;
+            
+        },
+        viewImageDetail:function(index){
+            //alert("start"+index);
+            var self=this;
+            this.$message({
+                message: '节点x上的容器'+index+'正在启动中'
             });
             
+            if(self.divShown==false) {
+                self.divShown=true;
+                var elm=document.getElementById("detailDiv");
+                elm.classList.add("enableLeft");
+                void elm.offsetWidth;
+            }
+            else {
+                var elm=document.getElementById("detailDiv");
+                elm.classList.remove("enableRight");
+                void elm.offsetWidth;
+                elm.classList.add("enableRight");
+            }
+
+            this.$message({
+                message: '启动成功',
+                type: 'success'
+            });
+        },
+        resetAnimation:function(){
+            var elm=document.getElementById("detailDiv");
+            elm.classList.remove("enableRight");
+            void elm.offsetWidth;
+            this.animationRight=false;
+            //var newone = elm.cloneNode(true);
+            //elm.parentNode.replaceChild(newone, elm);
+        },
+        deleteContainer:function(index){
+            this.$confirm('此操作将永久删除该镜像, 是否继续?', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+                }).then(() => {
+                this.$message({
+                    type: 'success',
+                    message: '删除成功!'
+                });
+                }).catch(() => {
+                this.$message({
+                    type: 'info',
+                    message: '已取消删除'
+                });          
+            });
+        },
+        addNewContainer:function(){
+            var self=this;
+            self.dialogPullImageVisible=false;
+            //alert(1);
+            self.$message({
+                message: '已在'+self.formPullImage.nodeName+'添加容器'+self.formPullImage.containerName,
+                type: 'success'
+            });
+        }
+     },
+     mounted() {
+        var self=this;
+        mockAll();
+
+        //clog("System Started", "info");
+        this.$root.eventHub.$emit('command-log', {text: "Image Management Interface", type: "info"});
+
+        axios.get(getServiceIP()+"/cluster/list").then(function(response){    
+            //console.log(response);
+            self.nodes=response.data.result;
+            if(self.nodes.length) self.formPullImage.nodeName=self.nodes[0].domain;           
         });
         
-        //do some drawing
-        /*
-        var canvas = document.getElementById("myCanvas");
-        var ctx = canvas.getContext("2d");
-        var imgbg = new Image();
-        imgbg.src = require("./assets/images/entity-container.png");
-        imgbg.onload = function(){
-            ctx.drawImage(imgbg, -20, 280);             
-        };
-        */
+        axios.get(getServiceIP()+"/action/listimages").then(function(response){    
+            //console.log(response);
+            self.sourceimages=response.data.repositories; 
+            if(self.sourceimages.length) self.formPullImage.imageName=self.sourceimages[0].name;
+            self.changeImage();
+        });
+
+        
     }
-    
- }
-
-
-
-</script> 
+}
+</script>
 
 <style>
-.blockimage {text-align:left;font-size:13px;}
-.blockimage div {position:relative;}
-.blockimage:hover, .activeimage
+.blocknode {text-align:left;font-size:13px;}
+.blocknode div {position:relative;float:left;margin-top:22px;}
+
+.blocknode .d-domain   { left:26px;font-size:16px; }
+.blocknode .d-ip { left:65px;padding-top:3px }
+.blocknode .d-containers{left:168px}
+
+.blocknode:hover, .activenode
 {
     box-shadow:inset 0px 0px 8px #AAA;
     -webkit-filter: contrast(1.5);
     cursor: pointer;
 }
 
-.blockimage .d-id   { left:38px; top:78px; }
-.blockimage .d-table { left:120px; top:-5px; }
-.blockimage .d-table table td{width:70px;}
+.containercontainer{
+    position:relative;
+    width:340px;
+    height:470px;
+    margin-top:20px;
+    background-repeat:no-repeat;
+    margin-left:5px;
+}
+.badge-item{
+     margin:20px 15px 0 15px;
+     width:70px;
+     height:90px;
+     text-align:center;
+     position:relative;
+     cursor:pointer;
+     float:left;
+     background-repeat:no-repeat;
+}
+.badge-item span{
+     line-height:150px;
+}
 
-.blockimagedetail div   {position:relative;text-align:left;}
-.blockimagedetail .s-sid      {left:30px; top:14px; }
-.blockimagedetail .s-id       {left:75px; top:65px; text-align:center;}
-.blockimagedetail .s-label    {left:73px; top:115px; text-align:center;}
-.blockimagedetail .s-created  {left:97px; top:147px; }
-.blockimagedetail .s-architecture {left:97px; top:162px; }
-.blockimagedetail .s-os       {left:97px; top:178px; }
-.blockimagedetail .s-size     {left:97px; top:195px; }
-.blockimagedetail .s-sha      {left:97px; top:277px;width:220px; }
-.blockimagedetail .s-cmd      {left:97px; top:286px; }
-
-.divcanvas img {position:absolute;}
-.isometric-icon {cursor:pointer; }
+.el-badge {
+    background-color: #f56c6c;
+    border-radius: 10px;
+    color: #fff;
+    display: inline-block;
+    font-size: 12px;
+    height: 18px;
+    line-height: 18px;
+    padding: 0 6px;
+    text-align: center;
+    border: 1px solid #fff;
+    position: absolute;
+    top: 0;
+    right: 10px;
+    -webkit-transform: translateY(-50%) translateX(100%);
+}
+.isometric-node{
+    position:absolute;
+    cursor:pointer;
+}
 .isometric-div {
     position:absolute;
     width: 80px;
     text-align:center;
     background-color:darkblue;
-	transform: rotateX(315deg) rotateY(35deg) rotateZ(0deg);
+	transform: rotateX(305deg) rotateY(35deg) rotateZ(0deg);
 }
 .isometricglow {
     filter: hue-rotate(90deg);
 }
+
 .el-tooltip__popper.is-light {
     color:black;
     font-family:微软雅黑;}
+.el-popover{
+    text-align:center;
+    min-width:60px;
+    height:30px;
+    padding:3px;
+    background:#eee;
+}
 .el-table--border::after, .el-table--group::after, .el-table::before { background-color: transparent !important;}
 .el-table tr, .el-table th, .cell {
   background-color: transparent !important;
+  height:20px;
   color:#bde8ff;
 }
 .el-table td, .el-table th.is-leaf{
@@ -307,6 +484,42 @@ export default {
     background-color:#222 !important;
     opacity: 0.7;
 }
+
+
+@keyframes fadeInDetail {
+  from {
+    opacity: 0;
+    transform: translate3d(120%, 0, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes fadeOutDetail {
+  0% {
+    opacity: 1;
+    transform: none;
+  }
+  50% {
+    opacity: 0;
+    transform: translate3d(120%, 0, 0);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+.enableLeft{
+    -webkit-animation: fadeInDetail 0.6s;
+    animation-fill-mode:both;
+}
+.enableRight{
+    -webkit-animation: fadeOutDetail 0.6s;
+    animation-fill-mode:both;
+}
+
 </style>
 
 

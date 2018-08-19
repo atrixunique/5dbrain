@@ -220,7 +220,8 @@ export default {
     mounted() {
         var self=this;
         mockAll();
-     
+        this.$root.eventHub.$emit('command-log', {text: "Dashboard Overseeing Interface", type: "info"});
+        
         axios.get(getServiceIP()+"/cluster/list").then(function(response){    
             //console.log(response);
             self.nodes=response.data.result;

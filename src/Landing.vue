@@ -1,7 +1,8 @@
 <template>
   <div id="app">
+
     <el-container>
-      <el-header id="navbar"><span>Time 16:03:28</span></el-header>
+      <el-header id="navbar"><span>{{Date().toLocaleString("hh:mm:ss")}}</span></el-header>
       <el-main>
         <el-container style="height:1005px">
           <el-aside style="width:338px;">
@@ -21,7 +22,18 @@
 
               </el-menu>
             </div>
-            <div style="bottom:0px;">Route</div>
+
+
+            <div>
+
+              <div class="consolewindow" id="consolewindow">
+
+              </div>
+              <div style="height:20px">
+                <input type="text" class="commandline" placeholder="Input command"></input>
+              </div>
+
+            </div>
 
           </el-aside>
 
@@ -55,7 +67,7 @@
 import Vue from 'vue'
 var sockJS= require('./assets/js/sockjs.min.js')
 var Stomp = require("./assets/js/stomp.min.js").Stomp
-var isconn= false
+var isconn= false;
 //var Stomp=window.Stomp
 //debugger;
 
@@ -77,10 +89,28 @@ export default {
       ]
     }
   },
-  methods: {
-    
+  mounted(){
+    this.$root.eventHub.$on('command-log', function(data){
+     
+        var color;
+        var d = new Date();
+  
+        //if (data.type == "info") color = "#3f5e9c";
+        //if (data.type == "warning") color = "red";
+        //if (data.type == "success") color = "green";
+
+        var msgNode = document.createElement("SPAN");
+        var textNode = document.createTextNode(d.toLocaleString("[hh:mm:ss]")+"  "+data.text);
+        msgNode.appendChild(textNode);
+        var cw=document.getElementById("consolewindow");
+        cw.appendChild(msgNode);
+        cw.appendChild((document.createElement("br")));
+        cw.scrollTop = cw.scrollHeight;
+      
+    });
   }
 }
+
 
 
 if(isconn) {
@@ -220,6 +250,29 @@ hr {border-color:transparent;}
 }
 .containerEntity {
     position:absolute;
+}
+.consolewindow{
+
+  padding:5px;
+  margin-top:177px;
+  width:280px;
+  height:135px;
+  margin-left:26px;
+  font-size:12px;
+  overflow-y:scroll;
+  overflow-x:hidden;
+  text-align:left;
+}
+.commandline
+{
+    margin-left: 7px;
+    margin-top:5px;
+    font-size: 12px;
+    background: #000;
+    border: 1px groove darkgray;
+    color: #ccc;
+    padding: 5px;
+    width: 280px;
 }
 
 
