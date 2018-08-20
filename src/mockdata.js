@@ -2,7 +2,7 @@ import Mock from 'mockjs';
 
 function getServiceIP()
 {
-    return 'http://10.42.0.85:8080/';
+    return 'http://10.42.0.220:9999/xbrain';
 }
 
 function getRealIP()
@@ -12,6 +12,7 @@ function getRealIP()
 
 function mockAll()
 {
+    return;
     Mock.mock(getServiceIP() + "getImageList", {
         body: [
             {
@@ -207,7 +208,7 @@ function mockAll()
                 tags: [
                     "v1"
                 ],
-                "name": "10.42.0.220ï¼š5000/httpd"
+                "name": "10.42.0.220ï¼?000/httpd"
             },
             {
                 tags: [
@@ -215,7 +216,7 @@ function mockAll()
                     "v2",
                     "latest"
                 ],
-                "name": "10.42.0.220ï¼š5000/pot"
+                "name": "10.42.0.220ï¼?000/pot"
             }
         ]
     });

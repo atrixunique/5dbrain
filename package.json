@@ -9,15 +9,17 @@
   },
   "dependencies": {
     "axios": "^0.18.0",
-    "element-ui": "^2.3.4",
+    "element-ui": "^2.4.6",
     "jquery": "^3.3.1",
     "mockjs": "^1.0.1-beta3",
     "node-static": "^0.7.10",
     "node-stomp-protocol": "^0.3.6",
     "nodejs-websocket": "^1.7.1",
+    "qs": "^6.5.2",
     "stomp-broker-js": "^1.2.0",
     "stompjs": "^2.3.3",
     "vue": "^2.5.16",
+    "vue-resource": "^1.5.1",
     "vue-socket.io": "^2.1.1-b"
   },
   "engines": {
