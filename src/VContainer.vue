@@ -87,7 +87,7 @@
                         <node-badge
                                 v-bind:id="'NB'+container.Id" 
                                 slot="reference"
-                                :name="container.Id" 
+                                :name="container.Names[0]" 
                                 :running="container.State" 
                                 :typeimg="getContainerClass(container.ImageID)"
                                 >
@@ -162,7 +162,7 @@ Vue.component('node-badge', {
     }
   },
   props: ['name','typeimg','running'],
-  template: '<div class="badge-item" :style="typeimg"><span>{{name}}</span><sup class="el-badge" :class="running">o</sup></div>'
+  template: '<div class="badge-item" :style="typeimg"><span>{{name}}</span><sup class="el-badge" :class="running">{{running}}</sup></div>'
 })
 
 export default {
@@ -265,16 +265,20 @@ export default {
         },
         nodeClick:function(index, domain){
             var self=this;
-            this.selectedNode=index;
-            axios.get(getServiceIP()+"/docker/listcontainer2").then(function(response){    
-                self.nodecontainers=response.data.result.container;
+            self.selectedNode=index;
+            
+            axios.defaults.headers.post['Content-Type'] = 'application/json';
+            axios({
+                method: 'post',
+                url:getServiceIP()+"/docker/listcontainer",
+                data:'{"nodename":"'+domain+'"}'
+            }).then((response)=>{
+                self.nodecontainers=response.data.container;
                 self.selectedIP=self.nodes[self.selectedNode].ip;
                 self.selectedTotal=self.nodecontainers.length;
 
                 self.$root.eventHub.$emit('command-log', {text: "Select Node "+index, type: "info"});
-
             });
-
         },
         getContainerClass:function(msg){
             if(msg=="sha256:fw") return this.containerfwclass;
@@ -336,10 +340,7 @@ export default {
             if(self.nodes.length) self.formNewContainer.nodeName=self.nodes[0].domain;
            
         });
-        axios.get(getServiceIP()+"/docker/listcontainer").then(function(response){    
-            //console.log(response);
-            self.nodecontainers=response.data.result.container; 
-        });
+
         axios.get(getServiceIP()+"/action/listimages").then(function(response){    
             //console.log(response);
             self.sourceimages=response.data.repositories; 
@@ -377,15 +378,18 @@ export default {
 .badge-item{
      margin:20px 15px 0 15px;
      width:70px;
-     height:90px;
+     height:30px;
      text-align:center;
      position:relative;
      cursor:pointer;
      float:left;
      background-repeat:no-repeat;
+     padding-top:55px;
 }
 .badge-item span{
-     line-height:150px;
+     font-size:12px;
+     width:60px;
+     word-wrap: break-word;
 }
 
 .el-badge {
@@ -401,10 +405,10 @@ export default {
     border: 1px solid #fff;
     position: absolute;
     top: 0;
-    right: 10px;
+    right: 30px;
     -webkit-transform: translateY(-50%) translateX(100%);
 }
-.is-running{
+.running{
     background-color: #2b8e1f;
 }
 .isometric-node{

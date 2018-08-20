@@ -76,7 +76,7 @@
                         <node-badge
                                 v-bind:id="'NB'+image.Id" 
                                 slot="reference"
-                                :name="image.Id" 
+                                :name="image.RepoTags" 
                                 :typeimg="getImageClass(image.RepoTags)"
                                 @click.native="viewImageDetail(index)"
                                 >
@@ -87,7 +87,7 @@
             </div>
 
             <div>
-                <img src="./assets/images/new-container.png" width=340 style="cursor:pointer" @click="dialogPullImageVisible=true"/>
+                <img src="./assets/images/new-image.png" width=340 style="cursor:pointer" @click="dialogPullImageVisible=true"/>
             </div>
         </div>
         <!-- Detail info listed for a certain container -->
@@ -280,14 +280,21 @@ export default {
         nodeClick:function(index, domain){
             var self=this;
             this.selectedNode=index;
-            self.selectedIP=self.nodes[self.selectedNode].ip;
-            self.selectedTotal=self.nodes[self.selectedNode].images;
 
-            axios.get(getServiceIP()+"/docker/listimage").then(function(response){    
-                self.nodeimages=response.data.result.images;
+            axios.defaults.headers.post['Content-Type'] = 'application/json';
+            axios({
+                method: 'post',
+                url:getServiceIP()+"/docker/listimage",
+                data:'{"nodename":"'+domain+'"}'
+            }).then((response)=>{
+
+                self.nodeimages=response.data.images;
+
+                self.selectedIP=self.nodes[self.selectedNode].ip;
+                self.selectedTotal=self.nodeimages.length;
+
                 self.$root.eventHub.$emit('command-log', {text: "Select Node "+index, type: "info"});
             });
-
         },
         changeImage:function()
         {
@@ -418,15 +425,19 @@ export default {
 .badge-item{
      margin:20px 15px 0 15px;
      width:70px;
-     height:90px;
+     height:30px;
      text-align:center;
      position:relative;
      cursor:pointer;
      float:left;
      background-repeat:no-repeat;
+     padding-top:55px;
 }
+
 .badge-item span{
-     line-height:150px;
+     font-size:12px;
+     width:60px;
+     word-wrap: break-word;
 }
 
 .el-badge {

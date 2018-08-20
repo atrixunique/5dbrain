@@ -1,30 +1,63 @@
 import Vue from 'vue'
 import ElementUI from 'element-ui'
-import vueRouter from  'vue-router'
 import VueResource from 'vue-resource'
 
 import 'element-ui/lib/theme-chalk/index.css'
 
 //Pages
 
-import Landing from './Landing.vue'
-import Entrance from './Entrance.vue'
+import BrainApp from './BrainApp.vue'
+import vueRouter from 'vue-router'
 
-Vue.use(ElementUI, { size: 'small' })
 Vue.use(vueRouter)
+Vue.use(ElementUI, { size: 'small' })
 Vue.use(VueResource)
 
 const router = new vueRouter({
   mode: 'history',
   base: __dirname,
   routes: [
-    { path: '/', component: resolve => require(['./VDashboard.vue'], resolve), meta: { mid: 0 } },
-    { path: '/Dashboard', component: resolve => require(['./VDashboard.vue'], resolve), meta: { mid: 1 } },
-    { path: '/Container', component: resolve => require(['./VContainer.vue'], resolve), meta: { mid: 2 } },
-    { path: '/Image', component: resolve => require(['./VImage.vue'], resolve), meta: { mid: 3 } },
-    { path: '/Info', component: resolve => require(['./VInfo.vue'], resolve), meta: { mid: 4 } },
-    { path: '/Decision', component: resolve => require(['./VDecision.vue'], resolve), meta: { mid: 5 } },
-    { path: '/System', component: resolve => require(['./VSystem.vue'], resolve), meta: { mid: 6 } }
+    { 
+      path: '/', 
+      component: resolve => require(['./Entrance.vue'], resolve), 
+      meta: { mid: 0 } },
+    { 
+      path: '/Portal', 
+      component: resolve => require(['./Portal.vue'], resolve), 
+      meta: { mid: 1 } 
+    },
+    { 
+      path: '/Defense', 
+      component: resolve => require(['./BrainDefense.vue'], resolve), 
+      meta: { mid: 2 },
+      children: [  //这里就是二级路由的配置
+        {
+          path: '/Dashboard',
+          component: resolve => require(['./VDashboard.vue'], resolve)
+        },
+        {
+          path: '/Container',
+          component: resolve => require(['./VContainer.vue'], resolve)
+        },
+        {
+          path: '/Image',
+          component: resolve => require(['./VImage.vue'], resolve)
+        },
+        {
+          path: '/Info',
+          component: resolve => require(['./VInfo.vue'], resolve)
+        },
+        {
+          path: '/Decision',
+          component: resolve => require(['./VDecision.vue'], resolve)
+        },
+        {
+          path: '/System',
+          component: resolve => require(['./VSystem.vue'], resolve)
+        },
+        
+      ]
+    },
   ]
 })
 
@@ -39,7 +72,7 @@ Vue.component('msg', {
 new Vue({
   el: '#app',
   router,
-  render: h => h(Landing),
+  render: h => h(BrainApp),
   data: {
     eventHub: new Vue()
   }

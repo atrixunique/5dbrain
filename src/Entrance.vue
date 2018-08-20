@@ -1,7 +1,7 @@
 <template>
     
-    <div :style="indexbg">
-        <div style="position:absolute;width:1920px;top:10px;text-align:center" >
+    <div :style="indexbg" id="bgDiv">
+        <div style="position:absolute;width:1920px;top:10px;left:0px;text-align:center" >
             <img src="./assets/landing/banner.png" width="500" style="padding:0px auto;"/>
         </div>
 
@@ -54,7 +54,7 @@ export default {
     methods:{
         login:function()
         {
-           
+            this.$router.push('/Portal');
         }
     }
 
@@ -62,7 +62,7 @@ export default {
 </script>
 
 <style>
-#app{
+#bgDiv{
     width:1920px;height:1080px;overflow:hidden;
 }
 body {margin:0px;}
