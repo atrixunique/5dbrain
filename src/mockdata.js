@@ -7,7 +7,7 @@ import searchlog from './mock/searchlog.json';
 
 function getServiceIP()
 {
-    return 'http://10.38.7.90:9999/xbrain';
+    return 'http://10.42.0.220:9999/xbrain';
 }
 
 function mockAll()
