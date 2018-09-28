@@ -49,7 +49,7 @@
         </el-container>
 
       </el-main>
-      <footer>Footer</footer>
+      <footer>CETCSC</footer>
       
     </el-container>
     <div id="cstklc">
@@ -65,100 +65,162 @@
 
 import Vue from 'vue'
 
-var sockJS= require('./assets/js/sockjs.min.js')
-var Stomp = require("./assets/js/stomp.min.js").Stomp
-var isconn= false;
-
-//var Stomp=window.Stomp
-//debugger;
-
-//import $ from 'jquery'
-
 export default {
   data(){
     return {
       server:{
-        remoteIP:"10.42.0.247:4243"
+        //remoteIP:"10.42.0.247:4243"
       },
       menuItems:[
         {id:0,name:"防御首页 Dashboard",path:"/Dashboard"},
         {id:1,name:"容器管理 Container Mgmt",path:"/Container"},
         {id:2,name:"镜像管理 Image Mgmt",path:"/Image"},
         {id:3,name:"信息管理 Info Mgmt",path:"/Info"},
-        {id:4,name:"决策管理 Decision Mgmt",path:"/Decision"},
-        {id:5,name:"系统管理 System Mgmt",path:"/System"}
-      ]
+        {id:4,name:"知识管理 Knowledge Mgmt",path:"/Knowledge"},
+        {id:5,name:"决策管理 Decision Mgmt",path:"/Decision"},
+        {id:6,name:"系统管理 System Mgmt2",path:"/System"}
+      ],
+      stompClient:null
     }
   },
+  methods: {
+      notifyMsg:function(msg)
+      {
+         this.$notify.info({
+                title: '隧道消息',
+                message: msg
+              });
+      }
+  },
   mounted(){
+    var _self=this;
+    
     this.$root.eventHub.$on('command-log', function(data){
-     
-        var color;
-        var d = new Date();
-  
-        //if (data.type == "info") color = "#3f5e9c";
-        //if (data.type == "warning") color = "red";
-        //if (data.type == "success") color = "green";
-
-        var msgNode = document.createElement("SPAN");
-        var textNode = document.createTextNode(d.toLocaleString("[hh:mm:ss]")+"  "+data.text);
-        msgNode.appendChild(textNode);
-        var cw=document.getElementById("consolewindow");
-        cw.appendChild(msgNode);
-        cw.appendChild((document.createElement("br")));
-        cw.scrollTop = cw.scrollHeight;
+            var color;
+            var d = new Date();
       
+            //if (data.type == "info") color = "#3f5e9c";
+            //if (data.type == "warning") color = "red";
+            //if (data.type == "success") color = "green";
+
+            var msgNode = document.createElement("span");
+            var textNode = document.createTextNode(d.toLocaleCNString("[hh:mm:ss]")+"  "+data.text);
+            msgNode.appendChild(textNode);
+            var cw=document.getElementById("consolewindow");
+            cw.appendChild(msgNode);
+            cw.appendChild(document.createElement("BR"));
+            cw.scrollTop = cw.scrollHeight;
+          
+        });
+        
+    this.$root.eventHub.$on('command-clear', function(){
+        var cw=document.getElementById("consolewindow");
+        cw.innerHTML="";
+        cw.scrollTop = cw.scrollHeight; 
     });
+
+    
+    
+    this.$root.eventHub.$emit('command-clear');
+
+
+    var sockJS= require('./assets/js/sockjs.min.js');
+    var Stomp = require("./assets/js/stomp.min.js").Stomp;
+    var isconn= true;
+
+    
+    if(isconn) {
+        
+        this.$root.eventHub.$emit('command-log', {text: "Connecting to subsription channel...", type: "info"});
+
+        var sockjs_url = "http://10.38.7.90:9999/webSocketServer";  
+        var sockjs = new SockJS(sockjs_url);  
+        this.stompClient = Stomp.over(sockjs);
+      
+        /*
+        var url = "ws://10.42.0.90:9999/";
+        var stompClient = Stomp.client(url);
+        var headers = {
+              login: 'atrix',
+              passcode: '123',
+              // additional header
+              'client-id': 'sub-0'
+            };
+        */
+
+        this.stompClient.connect(
+          {},
+          function connectCallback(frame){
+
+            //stompClient.send("/app/sendTest",{},JSON.stringify({ "name": "456" }));
+
+            _self.stompClient.subscribe("/topic/subscribeSSH", function(response){
+
+                  console.log("[data]"+ response.body); 
+                  _self.notifyMsg(response.body);
+            })
+            _self.stompClient.send("/app/subscribeSSH",{},JSON.stringify({ "name": "eureka"}));
+
+            _self.stompClient.subscribe("/topic/subscribeFirewall", function(response){
+                  console.log("[firewall]"+response.body);
+                  //var bd=eval("("+response.body+")");
+                  _self.notifyMsg(response.body);
+
+            });
+            _self.stompClient.send("/app/subscribeFirewall",{},JSON.stringify({ "name": "gold firewall"}));
+
+
+            _self.stompClient.subscribe("/topic/subscribeConpot", function(response){
+                
+                  console.log("[conpot]"+response.body);
+                  _self.notifyMsg(response.body);
+
+            });
+            _self.stompClient.send("/app/subscribeConpot",{},JSON.stringify({ "name": "silver conpot"}));
+
+            _self.stompClient.subscribe("/topic/subscribeDecision", function(response){
+                
+                  console.log("[decision]"+response.body);
+                  _self.notifyMsg(response.body);
+
+            });
+            _self.stompClient.send("/app/subscribeDecision",{},JSON.stringify({ "name": "Try decision 1"}));
+
+            
+          },
+          function errorCallback(error) {
+              console.log("连接失败" + error);
+          }
+
+        );
+    }
+
+
+
   }
 }
 
+Date.prototype.toLocaleCNString = function (fmt) {
+  var o = {
+    "M+": this.getMonth() + 1,                 //月份 
+    "d+": this.getDate(),                    //日 
+    "h+": this.getHours(),                   //小时 
+    "m+": this.getMinutes(),                 //分 
+    "s+": this.getSeconds(),                 //秒 
+    "q+": Math.floor((this.getMonth() + 3) / 3), //季度 
+    "S": this.getMilliseconds()             //毫秒 
+  };
+  if (/(y+)/.test(fmt)) {
+    fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+  }
+  for (var k in o) {
+    if (new RegExp("(" + k + ")").test(fmt)) {
+      fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+    }
+  }
+  return fmt;
+};
 
-
-if(isconn) {
-     
-
-    var sockjs_url = "http://10.42.0.90:9999/webSocketServer";  
-    var sockjs = new SockJS(sockjs_url);  
-    var stompClient = Stomp.over(sockjs);
-
-       
-
-     /*
-    var url = "ws://10.42.0.90:9999/";
-    var stompClient = Stomp.client(url);
-    var headers = {
-          login: 'atrix',
-          passcode: '123',
-          // additional header
-          'client-id': 'sub-0'
-        };
-    */
-
-    stompClient.connect(
-      {},
-      function connectCallback(frame){
-
-        //stompClient.send("/app/sendTest",{},JSON.stringify({ "name": "456" }));
-
-        stompClient.subscribe("/app/subscribeSSH", function(response){
-          console.log("[ok] subscribe successful");
-          console.log("[data]"+ response.body); 
-
-         stompClient.subscribe("/app/topic/subscribeSSH", function(response){
-            
-              console.log("[2]"+response.body);
-
-          });
-          //stompClient.send("/app/sendTest",{},JSON.stringify({ "name": "123" }));
-        })
-      },
-      function errorCallback(error) {
-          console.log("连接失败" + error);
-      }
-
-    );
-}
-// 
 
 </script>
 
@@ -203,6 +265,7 @@ html { overflow: hidden; }
 }
 footer{
   height:25px;
+  color:#6388c1;
 }
 
 hr {border-color:transparent;}
@@ -255,9 +318,9 @@ hr {border-color:transparent;}
 .consolewindow{
 
   padding:5px;
-  margin-top:177px;
+  margin-top:130px;
   width:280px;
-  height:135px;
+  height:160px;
   margin-left:26px;
   font-size:12px;
   overflow-y:scroll;
@@ -266,8 +329,8 @@ hr {border-color:transparent;}
 }
 .commandline
 {
-    margin-left: 7px;
-    margin-top:5px;
+    margin-left: -5px;
+    margin-top:10px;
     font-size: 12px;
     background: #000;
     border: 1px groove darkgray;

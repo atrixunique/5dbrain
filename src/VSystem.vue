@@ -1,16 +1,19 @@
 <template>
     <el-main>
         
-        <div class="ribbonimage" :style ="ribbonimage" style="text-align:left;">
-            <span style="position:relative;top:60px;left:40px;padding-right:140px;">系统管理包括基本设置、镜像设置、容器设置、事件设置、其它设置等几个有机组成部分。 <br/>
-            <span style="font-size:80%;color:#999">System management is composed of a series of parameters such as basic config, image config, container config, events config and misc config..</span></span>
+        <div class="ribbonimage" :style ="ribbonimage" style="text-align:left;width:800px">
+            <div style="position:relative;top:20px;left:40px;font-size:20px;font-weight:bold">系统管理</div>
+            <span style="position:relative;top:35px;left:65px;display:block;padding-right:80px;">系统管理包括基本设置、镜像设置、容器设置、事件设置、安全管理、其它设置等几个有机组成部分。
+            <br/>
+            <span style="font-size:80%;color:#999;">
+            System management is composed of a series of parameters such as basic config, image config, container config, events config and misc config.</span></span>
         </div>
 
         <div class="containerEntity" :style ="entitybackground">
         </div>
 
-        <div class="mainDiv">
-            <el-tabs type="border-card">
+        <div class="tabDiv">
+            <el-tabs type="border-card" >
                 <el-tab-pane>
                     <span slot="label"><i class="el-icon-date"></i>基本设置</span>
                     <el-form ref="formBasic" :model="formBasic" label-width="80px">
@@ -84,6 +87,54 @@
                     定时任务补偿
                 </el-tab-pane>
                 <el-tab-pane>
+                    <span slot="label"><i class="el-icon-phone"></i>安全管理</span>
+                    <el-table
+                    :data="visitlogs.slice(0,14)"
+                    style="width: 100%;background-color:transparent !important;"
+                    >
+                    <el-table-column
+                        label="事件"
+                        align="center"
+                        width="160">
+                        <template slot-scope="scope">登录</template>
+                    </el-table-column>
+                     <el-table-column
+                        prop="time"
+                        label="时间"
+                        align="center"
+                        width="150">
+                    </el-table-column>
+                     <el-table-column
+                        prop="'admin'"
+                        label="用户名"
+                        align="center"
+                        width="150">
+                        <template slot-scope="scope">admin</template>
+                    </el-table-column>
+                    <el-table-column
+                        prop="ip"
+                        label="IP"
+                        align="center"
+                        width="150">
+                    </el-table-column>
+                    <el-table-column
+                        prop="name"
+                        label="执行结果"
+                        align="center"
+                        width="320">
+                    </el-table-column>
+            </el-table>
+             <div style="width:94%;margin:0px 20px;height:40px;opacity:0.8;text-align:right;margin-top:20px;">
+                <el-pagination
+                    background
+                    layout="prev, pager, next"
+                    :total="25"
+                   >
+                </el-pagination>
+            </div>
+
+                </el-tab-pane>
+                <el-tab-pane>
                     <span slot="label"><i class="el-icon-star-off"></i>其它设置</span>
                     定时任务补偿
                 </el-tab-pane>
@@ -99,19 +150,18 @@ import Mock from 'mockjs';
 import axios from 'axios';
 
 import {getServiceIP, mockAll} from './mockdata.js';
-import {} from './commonfunc.js';
 
 export default {
     name: 'systemmgmt',
     data() {
         return {
             ribbonimage: {
-                backgroundImage: "url("+require("./assets/images/ribbon-system.png") + ")",
+                backgroundImage: "url("+require("./assets/images/ribbon.png") + ")",
                 position:"absolute",
                 left:"324px",
                 top:"158px",
-                width:"1586px",
-                height:"151px"
+                width:"1257px",
+                height:"153px"
             },
             entitybackground: {
                 backgroundImage: "url("+require("./assets/images/entity-system.png") + ")",
@@ -132,14 +182,21 @@ export default {
                 desc: ''
             },
             formImage:{},
-            formLabelWidth: '120px'
+            formLabelWidth: '120px',
+            visitlogs:[]
         }
      },
      methods:{
 
      },
      mounted() {
-       
+        var self=this;
+        mockAll();
+
+       axios.get(getServiceIP()+"/logger/searchlog").then(function(response){    
+            //debugger;
+            self.visitlogs=response.data.appfirewallMongoLogger;
+        });
 
         
     }
@@ -147,14 +204,14 @@ export default {
 </script>
 
 <style>
-.mainDiv{
+.tabDiv{
     position:absolute;
     left:360px;
     top:310px;
     width:1000px;
     height:602px;
 }
-.mainDiv i{
+.tabDiv i{
     margin-right:10px;
 }
 .el-tabs--border-card
@@ -177,6 +234,22 @@ export default {
 .el-form-item__content {
     text-align:left;
 }
+
+.el-table--border::after, .el-table--group::after, .el-table::before { background-color: transparent !important;}
+.el-table tr, .el-table th, .cell {
+  background-color: transparent !important;
+  color:#bde8ff;
+  height:18px;
+}
+.el-table td, .el-table th.is-leaf{
+    border-bottom-color: #006AA7 !important;
+    border-bottom:1px solid #006AA7;
+}
+.el-table--enable-row-hover .el-table__body tr:hover>td{
+    background-color:#222 !important;
+    opacity: 0.7;
+}
+.current-row td{background-color:#3b629e !important;opacity:0.8;}
 
 </style>
 

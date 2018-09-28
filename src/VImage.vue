@@ -96,10 +96,14 @@
             >
         </div>
 
-        <div class="ribbonimage" :style ="ribbonimage" style="text-align:left;">
-            <span style="position:relative;top:60px;left:40px;padding-right:140px;">镜像是一个只读的安全载荷容器模板，含有启动安全载荷容器所需的文件系统结构及其内容，因此是智能安全体系的基础资源。<br/>
-            <span style="font-size:80%;color:#999">Images are fundamental resource for intelligent security framework, existed as read-only securiity workload container template, which contains file system structure and contents necessary to boot the container.</span></span>
+        <div class="ribbonimage" :style ="ribbonimage" style="text-align:left;width:800px">
+            <div style="position:relative;top:20px;left:40px;font-size:20px;font-weight:bold">镜像管理</div>
+            <span style="position:relative;top:35px;left:65px;display:block;padding-right:80px;">镜像是一个只读的安全载荷容器模板，含有启动安全载荷容器所需的文件系统结构及其内容，因此是智能安全体系的基础资源。
+            <br/>
+            <span style="font-size:80%;color:#999;">
+           Images are fundamental resource for intelligent security framework, existed as read-only securiity workload container template, which contains file system structure and contents necessary to boot the container.</span></span>
         </div>
+
 
 
         <div class="containerEntity" :style ="entitybackground">
@@ -143,7 +147,8 @@
             v-bind:id="'LN'+index"
             v-bind:style="computeLeft(index ,'node')"
             v-bind:class="{isometricglow:isActive(index)}"
-            src="./assets/images/big-node.png" 
+            src="./assets/images/big-node.png"
+            @click="nodeClick(index, node.domain)"
             width=180>
         </img>
         <div v-for="(node, index) in nodes"
@@ -228,7 +233,7 @@ export default {
                 height:"668px"
             },
             ribbonimage: {
-                backgroundImage: "url("+require("./assets/images/ribbon-image.png") + ")",
+                backgroundImage: "url("+require("./assets/images/ribbon.png") + ")",
                 position:"absolute",
                 left:"324px",
                 top:"158px",
@@ -435,9 +440,12 @@ export default {
 }
 
 .badge-item span{
-     font-size:12px;
-     width:60px;
-     word-wrap: break-word;
+    font-size: 10px;
+    line-height: 10px;
+    width: 72px;
+    word-wrap: break-word;
+    display: block;
+    padding-top: 12px;
 }
 
 .el-badge {

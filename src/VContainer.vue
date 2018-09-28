@@ -85,13 +85,14 @@
                         </el-button>
 
                         <node-badge
-                                v-bind:id="'NB'+container.Id" 
-                                slot="reference"
-                                :name="container.Names[0]" 
-                                :running="container.State" 
-                                :typeimg="getContainerClass(container.ImageID)"
-                                >
-                            </node-badge>
+                            v-bind:id="'NB'+container.Id" 
+                            slot="reference"
+                            :name="container.Names[0]" 
+                            :running="container.State" 
+                            :typeimg="getContainerClass(container.ImageID)"
+                            @click.native="viewContainerDetail(index)"
+                            >
+                        </node-badge>
                     </el-popover>
                 </div>
 
@@ -102,12 +103,15 @@
             </div>
         </div>
         <!-- Detail info listed for a certain container -->
-        <div class="detailimage" :style ="detailimage">
+        <div id="detailDiv" class="detailimage" :style ="detailimage">
         </div>
 
-        <div class="ribbonimage" :style ="ribbonimage" style="text-align:left;">
-            <span style="position:relative;top:60px;left:40px;padding-right:140px;">容器是在节点上运行的的受限进程，是镜像的实体，可以被创建、启动、停止、删除、暂停等。容器进程是运行在隔离的环境里，因而相比直接在宿主上运行更加安全。 <br/>
-            <span style="font-size:80%;color:#999">Container is restricted process running on nodes, is the entity of image that can be created, run, stopped, deleted and suspended. The process in a container is running in isolated env, that is safer compared with running on naked host.</span></span>
+        <div class="ribbonimage" :style ="ribbonimage" style="text-align:left;width:800px">
+            <div style="position:relative;top:20px;left:40px;font-size:20px;font-weight:bold">容器管理</div>
+            <span style="position:relative;top:35px;left:65px;display:block;padding-right:80px;">容器是在节点上运行的的受限进程，是镜像实体，可以被创建、启动、停止、删除、暂停等。进程运行在隔离的环境里，因而相比直接在宿主上运行更加安全。
+            <br/>
+            <span style="font-size:80%;color:#999;">
+            Container is restricted process running on nodes, is the entity of image that can be created, run, stopped, deleted and suspended. The process in a container is running in isolated env, that is safer compared with running on naked host.</span></span>
         </div>
 
 
@@ -207,7 +211,7 @@ export default {
                 height:"668px"
             },
             ribbonimage: {
-                backgroundImage: "url("+require("./assets/images/ribbon-container.png") + ")",
+                backgroundImage: "url("+require("./assets/images/ribbon.png") + ")",
                 position:"absolute",
                 left:"324px",
                 top:"158px",
@@ -222,7 +226,8 @@ export default {
                 width:"340px",
                 height:"495px",
                 paddingLeft:"2px",
-                zIndex:"10"
+                zIndex:"10",
+                opacity:0
             },
             containercontainer: {
                 backgroundImage: "url("+require("./assets/images/container-container.png") + ")"
@@ -239,7 +244,8 @@ export default {
             containernullclass:{
                 backgroundImage: "url("+require("./assets/images/container-null.png") + ")"
             },
-            formLabelWidth: '100px'
+            formLabelWidth: '100px',
+            divShown:false
         }
      },
      methods:{
@@ -273,12 +279,31 @@ export default {
                 url:getServiceIP()+"/docker/listcontainer",
                 data:'{"nodename":"'+domain+'"}'
             }).then((response)=>{
+                
+
                 self.nodecontainers=response.data.container;
                 self.selectedIP=self.nodes[self.selectedNode].ip;
                 self.selectedTotal=self.nodecontainers.length;
 
                 self.$root.eventHub.$emit('command-log', {text: "Select Node "+index, type: "info"});
             });
+        },
+        viewContainerDetail:function(index){
+            var self=this;
+            
+            if(self.divShown==false) {
+                self.divShown=true;
+                var elm=document.getElementById("detailDiv");
+                elm.classList.add("enableLeft");
+                void elm.offsetWidth;
+            }
+            else {
+                var elm=document.getElementById("detailDiv");
+                elm.classList.remove("enableRight");
+                void elm.offsetWidth;
+                elm.classList.add("enableRight");
+            }
+
         },
         getContainerClass:function(msg){
             if(msg=="sha256:fw") return this.containerfwclass;
@@ -331,11 +356,10 @@ export default {
         var self=this;
         mockAll();
 
-        //clog("System Started", "info");
         this.$root.eventHub.$emit('command-log', {text: "Container Management Interface", type: "info"});
 
         axios.get(getServiceIP()+"/cluster/list").then(function(response){    
-            //console.log(response);
+            
             self.nodes=response.data.result;
             if(self.nodes.length) self.formNewContainer.nodeName=self.nodes[0].domain;
            
@@ -435,6 +459,41 @@ export default {
     height:30px;
     padding:3px;
     background:#eee;
+}
+
+
+@keyframes fadeInDetail {
+  from {
+    opacity: 0;
+    transform: translate3d(120%, 0, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes fadeOutDetail {
+  0% {
+    opacity: 1;
+    transform: none;
+  }
+  50% {
+    opacity: 0;
+    transform: translate3d(120%, 0, 0);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+.enableLeft{
+    -webkit-animation: fadeInDetail 0.6s;
+    animation-fill-mode:both;
+}
+.enableRight{
+    -webkit-animation: fadeOutDetail 0.6s;
+    animation-fill-mode:both;
 }
 </style>
 

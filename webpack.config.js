@@ -3,6 +3,7 @@ const webpack = require('webpack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const url = require('url')
 const publicPath = ''
+const localAddr='192.168.49.135'
 
 module.exports = (options = {}) => ({
   entry: {
@@ -24,6 +25,7 @@ module.exports = (options = {}) => ({
         test: /\.js$/,
         use: ['babel-loader'],
         exclude: /node_modules/
+        
       },
       {
         test: /\.css$/,
@@ -58,13 +60,13 @@ module.exports = (options = {}) => ({
     extensions: ['.js', '.vue', '.json', '.css']
   },
   devServer: {
-    host: '10.42.0.221',
+    host: localAddr,
     //host: '192.168.31.133',
     port: 8080,
     proxy: {
       '/api/': {
         //target: 'http://192.168.31.133:8080',
-        target: 'http://10.42.0.221:8080',
+        target: 'http://'+localAddr+':8080',
         changeOrigin: true,
         pathRewrite: {
           '^/api': ''

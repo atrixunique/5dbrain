@@ -1,13 +1,13 @@
 import Mock from 'mockjs';
+import searchfirewall from './mock/searchfirewall.json';
+import searchconpot from './mock/searchconpot.json';
+import searchmonitor from './mock/searchmonitor.json';
+import searchdecision from './mock/searchdecision.json';
+import searchlog from './mock/searchlog.json';
 
 function getServiceIP()
 {
-    return 'http://10.42.0.220:9999/xbrain';
-}
-
-function getRealIP()
-{
-    
+    return 'http://10.38.7.90:9999/xbrain';
 }
 
 function mockAll()
@@ -95,28 +95,47 @@ function mockAll()
         ] 
     });
     Mock.mock(getServiceIP() + "/cluster/list", {
-        result: [{
-                domain: "xbrain-1",
-                ip:"10.42.0.133",
-                containers:"1/1",
-                images:"2"
-            },
-            {
-                domain: "xbrain-2",
-                ip: "10.42.0.131",
-                containers: "0/2",
-                images: "3"
-            },
-            {
-                domain: "xbrain-3",
-                ip: "10.42.0.135",
-                containers: "1/3",
-                images: "1"
-            }
+            "result":[
+                {
+                    "password":"root",
+                    "flag":1,
+                    "domain":"xbrain-1",
+                    "ip":"10.42.0.133",
+                    "id":1,
+                    "state":"Running",
+                    "user":"root",
+                    "url":"tcp://10.42.0.133:2378",
+                    "docker":"v18.03.1-ce",
+                    "info":""
+                },
+                {
+                    "password":"root",
+                    "flag":1,
+                    "domain":"xbrain-2",
+                    "ip":"10.42.0.113",
+                    "id":2,
+                    "state":"Running",
+                    "user":"root",
+                    "url":"tcp://10.42.0.113:2378",
+                    "docker":"v18.03.1-ce",
+                    "info":""
+                },
+                {
+                    "password":"root",
+                    "flag":1,
+                    "domain":"xbrain-3",
+                    "ip":"10.42.0.135",
+                    "id":3,
+                    "state":"Running",
+                    "user":"root",
+                    "url":"tcp://10.42.0.135:2378",
+                    "docker":"v18.03.1-ce",
+                    "info":""
+                }
         ]
     });
     Mock.mock(getServiceIP() + "/docker/listcontainer", {
-        result: {
+        
             status:"success",
             message: "成功获取容器名称",
             container: [
@@ -126,7 +145,7 @@ function mockAll()
                     Labels: {},
                     Command: "/usr/bin/sh",
                     ImageID: "sha256:fw",
-                    State: "is-stopped"
+                    State: "stopped"
                 },
                 {
                     Id: "002",
@@ -134,7 +153,7 @@ function mockAll()
                     Labels: {},
                     Command: "/usr/bin/sh",
                     ImageID: "sha256:hp",
-                    State: "is-running"
+                    State: "running"
                 },
                 {
                     Id: "003",
@@ -142,13 +161,12 @@ function mockAll()
                     Labels: {},
                     Command: "/usr/bin/sh",
                     ImageID: "sha256:dao",
-                    State: "is-running"
+                    State: "running"
                 }
 
             ]
 
-        }
-    });
+      });
     Mock.mock(getServiceIP() + "/docker/listcontainer2", {
         result: {
             status: "success",
@@ -176,57 +194,106 @@ function mockAll()
         }
     });
     Mock.mock(getServiceIP() + "/docker/listimage", {
-        result: {
-            status: "success",
-            message: "成功获取镜像名称",
-            images: [
-                {
-                    Id: "image01",
-                    Names: ["/suspicious_kowalevski"],
-                    Labels: {},
-                    Command: "/usr/bin/sh",
-                    ImageID: "sha256:fw",
-                    RepoTags: []
-                },
-                {
-                    Id: "image02",
-                    Names: ["/sad_meninsky"],
-                    Labels: {},
-                    Command: "/usr/bin/sh",
-                    ImageID: "sha256:hp",
-                    RepoTags: []
-                }
-
-            ]
-
-        }
-    });
-
-    Mock.mock(getServiceIP() + "/action/listimages", {
-        "repositories": [
+        "status":"success",
+        "message":"成功获取镜像名称",
+        "images":[
             {
-                tags: [
-                    "v1"
-                ],
-                "name": "10.42.0.220�?000/httpd"
+                "Id":"sha256:fa05455e1a18ab3a578dba39fc268895baa22a453f13a0358c13b6a9ac1e9d9c",
+                "Labels":{},
+                "RepoTags":[
+                    "10.42.0.220:5000/lmsensorsbeat:latest"
+                ]
             },
             {
-                tags: [
-                    "1.0",
-                    "v2",
-                    "latest"
-                ],
-                "name": "10.42.0.220�?000/pot"
+                "Id":"sha256:f0874c9b66a1c571fe73d6907dbdc02d9eba31325d0e32f4e4f227a67c261ad2",
+                "Labels":{},
+                "RepoTags":[
+                    "10.42.0.220:5000/metricbeat:latest"
+                ]
+            },
+            {
+                "Id":"sha256:c82521676580c4850bb8f0d72e47390a50d60c8ffe44d623ce57be521bca9869",
+                "Labels":{
+                    "maintainer":"NGINX Docker Maintainers <docker-maint@nginx.com>"
+                },
+                "RepoTags":[
+                    "nginx:latest"
+                ]
+            },
+            {
+                "Id":"sha256:8b89e48b5f157d9455c963b57c85d21e2337c58b8c983bc06f88476610adc129",
+                "Labels":{
+                    "maintainer":"NGINX Docker Maintainers <docker-maint@nginx.com>"
+                },
+                "RepoTags":null
+            },
+            {
+                "Id":"sha256:54a1d1e6f009f150c85c5ced86d1973600992bbd253fa87bb839e78243ce032f",
+                "Labels":null,
+                "RepoTags":[
+                    "10.42.0.220:5000/pot:v2"
+                ]
+            },
+            {
+                "Id":"sha256:fb2f3851a97186bb0eaf551a40b94782712580c2feac0d15ba925bef2da5fc18",
+                "Labels":null,
+                "RepoTags":[
+                    "10.42.0.220:5000/httpd:v1"
+                ]
             }
         ]
     });
 
+    Mock.mock(getServiceIP() + "/action/listimages", {
+        "repositories":[
+            {
+                "tags":[
+                    "latest"
+                ],
+                "name":"10.42.0.220:5000/conpot"
+            },
+            {
+                "tags":[
+                    "v1"
+                ],
+                "name":"10.42.0.220:5000/httpd"
+            },
+            {
+                "tags":[
+                    "latest"
+                ],
+                "name":"10.42.0.220:5000/lmsensorsbeat"
+            },
+            {
+                "tags":[
+                    "latest",
+                    "v2"
+                ],
+                "name":"10.42.0.220:5000/metricbeat"
+            },
+            {
+                "tags":[
+                    "latest"
+                ],
+                "name":"10.42.0.220:5000/waf-all"
+            },
+            {
+                "tags":[
+                    "latest"
+                ],
+                "name":"10.42.0.220:5000/waf-zero"
+            }
+        ]
+    });
 
-
+    Mock.mock(getServiceIP() + "/logger/searchfirewall",searchfirewall);
+    Mock.mock(getServiceIP() + "/logger/searchconpot", searchconpot);
+    Mock.mock(getServiceIP() + "/logger/searchmonitor", searchmonitor);
+    Mock.mock(getServiceIP() + "/logger/searchdecision", searchdecision);
+    Mock.mock(getServiceIP() + "/logger/searchlog", searchlog);
 }
 
 export{
     mockAll,
-    getServiceIP,
-    getRealIP
+    getServiceIP
 }

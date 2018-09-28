@@ -22,9 +22,12 @@
         </el-dialog>
 
 
-        <div class="ribbonimage" :style ="ribbonimage" style="text-align:left;">
-             <span style="position:relative;top:60px;left:40px;padding-right:120px;">防御脑是人工智能应用于网络空间防御多元目标的深刻实践，通过生能、聚能、赋能、释能机制，实现安全能力的精准投送和攻击面的全局管理。 <br/>
-             <span style="font-size:80%;color:#999">Defense Brain is an active component of 5D brain, that profoundly apply dynamic and intelligent mechanism into cyberspace defense practice by generating, aggregating, enabling and discharging energy, to overwhelmingly  achineve attacking surface management and exact security abilities delivery</span></span>
+        <div class="ribbonimage" :style ="ribbonimage" style="text-align:left;width:800px">
+            <div style="position:relative;top:20px;left:40px;font-size:20px;font-weight:bold">防御首页</div>
+            <span style="position:relative;top:35px;left:65px;display:block;padding-right:80px;">防御脑是人工智能应用于网络空间防御多元目标的深刻实践，通过生能、聚能、赋能、释能机制，实现安全能力的精准投送和攻击面的全局管理。
+            <br/>
+            <span style="font-size:80%;color:#999;">
+            Defense Brain is an active component of 5D brain, that profoundly apply dynamic and intelligent mechanism into cyberspace defense practice by generating, aggregating, enabling and discharging energy, to overwhelmingly  achineve attacking surface management and exact security abilities delivery.</span></span>
         </div>
 
         <div class="containerEntity" :style ="entitybackground">
@@ -118,23 +121,26 @@
                 
             </img>
 
+            <div style="position: absolute;width: 345px;height: 132px;left: 1240px;top:346px;font-size: 12px;">
+                <p>镜像源镜像数：{{imageCount}}</p>
+            </div>
 
             <div style="position:absolute;width:345px;height:132px;left:1122px;top:370px;">
-                <p>镜像源镜像数：2</p>
+                
                 <el-table
                     :data="images"
                     style="width: 100%;background-color:transparent !important;"
                     >
                     <el-table-column
                         prop="name"
-                        label="名称"
-                        align="center"
-                        width="160">
+                        label="镜像名称"
+                        align="left"
+                        width="200">
                     </el-table-column>
                     <el-table-column
                         label="TAG"
                         align="center"
-                        width="180">
+                        width="140">
                         <template slot-scope="scope">
                                 <span v-for="version in scope.row.tags" style="margin-left: 5px">
                                     <el-tag>{{version}}</el-tag>
@@ -176,12 +182,12 @@ export default {
                 pass:''
             },
             ribbonimage: {
-                backgroundImage: "url("+require("./assets/images/ribbon-dashboard.png") + ")",
+                backgroundImage: "url("+require("./assets/images/ribbon.png") + ")",
                 position:"absolute",
                 left:"324px",
                 top:"158px",
-                width:"1586px",
-                height:"151px"
+                width:"1257px",
+                height:"153px"
             },
             entitybackground: {
                 backgroundImage: "url("+require("./assets/images/entity-landing.png") + ")",
@@ -190,7 +196,8 @@ export default {
                 width:"1500px",
                 height:"694px"
             },
-            formLabelWidth: '160px'
+            formLabelWidth: '160px',
+            imageCount:0
         }
      },
     methods:{
@@ -230,6 +237,7 @@ export default {
         axios.get(getServiceIP()+"/action/listimages").then(function(response){    
             //console.log(response);
             self.images=response.data.repositories;
+            self.imageCount=self.images.length;
         });
         
     }

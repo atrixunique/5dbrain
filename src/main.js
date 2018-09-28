@@ -8,6 +8,16 @@ import 'element-ui/lib/theme-chalk/index.css'
 
 import BrainApp from './BrainApp.vue'
 import vueRouter from 'vue-router'
+import Entrance from './Entrance.vue'
+import Portal from './Portal.vue'
+import BrainDefense from './BrainDefense.vue'
+import VDashboard from './VDashboard.vue'
+import VContainer from './VContainer.vue'
+import VImage from './VImage.vue'
+import VInfo from './VInfo.vue'
+import VDecision from './VDecision.vue'
+import VKnowledge from './VKnowledge.vue'
+import VSystem from './VSystem.vue'
 
 Vue.use(vueRouter)
 Vue.use(ElementUI, { size: 'small' })
@@ -19,44 +29,26 @@ const router = new vueRouter({
   routes: [
     { 
       path: '/', 
-      component: resolve => require(['./Entrance.vue'], resolve), 
+      component: Entrance, 
       meta: { mid: 0 } },
     { 
       path: '/Portal', 
-      component: resolve => require(['./Portal.vue'], resolve), 
+      component: Portal, 
       meta: { mid: 1 } 
     },
     { 
       path: '/Defense', 
-      component: resolve => require(['./BrainDefense.vue'], resolve), 
+      component: BrainDefense, 
       meta: { mid: 2 },
       children: [  //这里就是二级路由的配置
-        {
-          path: '/Dashboard',
-          component: resolve => require(['./VDashboard.vue'], resolve)
-        },
-        {
-          path: '/Container',
-          component: resolve => require(['./VContainer.vue'], resolve)
-        },
-        {
-          path: '/Image',
-          component: resolve => require(['./VImage.vue'], resolve)
-        },
-        {
-          path: '/Info',
-          component: resolve => require(['./VInfo.vue'], resolve)
-        },
-        {
-          path: '/Decision',
-          component: resolve => require(['./VDecision.vue'], resolve)
-        },
-        {
-          path: '/System',
-          component: resolve => require(['./VSystem.vue'], resolve)
-        },
-        
-      ]
+        { path: '/Dashboard',component: VDashboard},
+        { path: '/Container',component: VContainer},
+        { path: '/Image',component: VImage},
+        { path: '/Info',component: VInfo},
+        { path: '/Decision',component: VDecision},
+        { path: '/Knowledge',component: VKnowledge},
+        { path: '/System',component: VSystem},
+       ]
     },
   ]
 })
@@ -78,7 +70,7 @@ new Vue({
   }
 })
 
-Date.prototype.toLocaleString = function (fmt) {
+Date.prototype.toLocaleCNString = function (fmt) {
   var o = {
     "M+": this.getMonth() + 1,                 //月份 
     "d+": this.getDate(),                    //日 
