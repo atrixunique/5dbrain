@@ -335,12 +335,17 @@ export default {
         });
 
 
+
+        
+
+
         axios.defaults.headers.post['Content-Type'] = 'application/json';
         axios({
                 method: 'post',
                 url:getServiceIP()+"/logger/searchfirewall",
                 data:'{currentPage:1, pageSize:50}'
         }).then(function(response){    
+
             self.totalItem=response.data.pageCount*50;
             self.firewallMongoLogger=response.data.firewallMongoLogger;
         });

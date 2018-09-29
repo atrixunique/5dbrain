@@ -1,4 +1,5 @@
 import Mock from 'mockjs';
+
 import searchfirewall from './mock/searchfirewall.json';
 import searchconpot from './mock/searchconpot.json';
 import searchmonitor from './mock/searchmonitor.json';
@@ -14,8 +15,6 @@ function getServiceIP()
 function mockAll()
 {
     
-    
-    console.log("[hahaha]"+searchconpot);
     Mock.mock("http://10.42.0.220/mock/foaf", foaf);
     
     //return;
@@ -291,6 +290,7 @@ function mockAll()
             }
         ]
     });
+
 
     Mock.mock(getServiceIP() + "/logger/searchfirewall",searchfirewall);
     Mock.mock(getServiceIP() + "/logger/searchconpot", searchconpot);

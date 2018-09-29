@@ -1,5 +1,16 @@
 <template>
     <el-main>
+         <el-dialog title="路径回溯" :visible.sync="dialogShowTrace" width="60%">
+            <div class="div_trace" style="width:100%;height:300px;border:1px solid gray">
+                <svg class="svg_trace" width=800 height=300></svg>
+            </div>
+
+            <div slot="footer" class="dialog-footer">
+
+                <el-button type="primary" @click="dialogShowTrace=false">确定</el-button>
+            </div>
+        </el-dialog>
+
         <div class="asideimage" :style ="asideimage">
             <div style="height:125px"></div>
             <img src="./assets/images/new-rule.png" width=340 style="cursor:pointer"/>
@@ -161,6 +172,7 @@
                     style="width: 100%;background-color:transparent !important;margin-left: 20px;
     margin-top: 60px;"
                      @cell-mouse-enter="table_hover"
+                     @row-click="show_trace"
                     >
                     <el-table-column
                         prop="timestamp"
@@ -215,6 +227,7 @@ import Mock from 'mockjs';
 import axios from 'axios';
 
 import {getServiceIP, mockAll} from './mockdata.js';
+
 
 export default {
     name: 'imagemgmt',
@@ -294,7 +307,8 @@ export default {
                 rule:'',
                 result:'',
                 urgent:''
-            }
+            },
+            dialogShowTrace:false
         }
      },
     methods:{
@@ -305,6 +319,87 @@ export default {
             this.decisionDetail.rule=row.filesName;
             this.decisionDetail.result=row.event_info.attack_category;
             this.decisionDetail.urgent=row.event_info.maturity;
+         },
+         show_trace:function(){
+            this.dialogShowTrace=true;
+
+            var width = 800, height = 460;
+            
+            var d3= require('./assets/js/d3v4.js');
+            var cola= require('./assets/js/cola.min.js');
+
+            var color = d3.scaleOrdinal(d3.schemeCategory20);
+            var cola = cola.d3adaptor(d3)
+                .linkDistance(100)
+                .avoidOverlaps(true)
+                .size([width, height]);
+
+            var svg = d3.select('.svg_trace');
+            
+            var graph={
+                "nodes":[
+                {"name":"node1:192.168.1.104","group":10},
+                {"name":"node2:218.241.165.129","group":10},
+                {"name":"node3:218.241.165.130","group":10},
+                {"name":"node4:218.241.165.133","group":10},
+                {"name":"node5:218.241.165.131","group":10},
+                {"name":"node6:218.241.165.134","group":10}
+                ],
+                "links":[
+                {"source":0,"target":1,"value":1},
+                {"source":1,"target":2,"value":1},
+                {"source":2,"target":3,"value":1},
+                {"source":3,"target":4,"value":1},
+                {"source":4,"target":5,"value":1}
+                ]
+            };
+            cola.nodes(graph.nodes)
+                .links(graph.links)
+                .avoidOverlaps(true)
+                .jaccardLinkLengths(100,5)//distance between nodes
+                .start(30);
+
+            var link = svg.selectAll(".link")
+                .data(graph.links)
+                .enter().append("line")
+                .attr("class", "link")
+                .style("stroke-width", function (d) { return (Math.sqrt(d.value)); });
+
+            var node = svg.selectAll(".node")
+                .data(graph.nodes)
+                .enter().append("circle")
+                .attr("class", "node")
+                .attr("r", 7.5)//radius of the nodes
+                .style("fill", function (d) { return color(d.group); })
+                .call(cola.drag);
+
+            var label = svg.selectAll(".label")
+                .data(graph.nodes)
+                .enter().append("text")
+                .attr("class", "label")
+                .text(function (d) { return d.name; })
+                .call(cola.drag);
+
+            node.append("title")
+                .text(function (d) { 
+                    return [d.name,"<--group-->: ",d.group]; });
+
+            cola.on("tick", function () {
+                link.attr("x1", function (d) { return d.source.x; })
+                    .attr("y1", function (d) { return d.source.y; })
+                    .attr("x2", function (d) { return d.target.x; })
+                    .attr("y2", function (d) { return d.target.y; });
+
+                node.attr("cx", function (d) { return d.x; })
+                    .attr("cy", function (d) { return d.y; });
+        
+        
+                label.attr("x", function (d) { return d.x+8; })
+                    .attr("y", function (d) {
+                        var h = this.getBBox().height;
+                        return d.y + h/4;});
+            
+            });
          }
     },
     mounted() {
@@ -321,6 +416,9 @@ export default {
         }).then(function(response){
             self.appfirewallMongoLogger=response.data.appfirewallMongoLogger;
         });
+
+        //debugger;
+            
         
     }
     
@@ -397,6 +495,26 @@ export default {
     top:0px;
     width: 11px;
     height: 11px;
+}
+
+.node 
+{
+    stroke: #fff;
+    stroke-width: 1.5px;
+    cursor: move;
+}
+
+.link {
+    stroke: #999;
+    stroke-opacity:0.8;
+}
+
+.label {
+    fill: black;
+    font-family: Verdana;
+    font-size: 11px;
+    text-anchor: start;
+    cursor: move;
 }
 </style>
 

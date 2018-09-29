@@ -288,7 +288,6 @@ export default {
         var self=this;
         mockAll();
 
-
         webvowl.app().initialize();
         
     }
@@ -302,6 +301,12 @@ export default {
 @import './assets/css/webvowl.css';
 @import './assets/css/webvowl.app.css';
 
+
+#loading-progress {
+    left: 50px;
+    top: 310px;
+    position: absolute;
+}
 
 .blocknode {text-align:left;font-size:13px;}
 .blocknode div {position:relative;float:left;margin-top:22px;}
