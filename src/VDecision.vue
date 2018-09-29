@@ -2,7 +2,7 @@
     <el-main>
          <el-dialog title="路径回溯" :visible.sync="dialogShowTrace" width="60%">
             <div class="div_trace" style="width:100%;height:300px;border:1px solid gray">
-                <svg class="svg_trace" width=800 height=300></svg>
+                
             </div>
 
             <div slot="footer" class="dialog-footer">
@@ -135,7 +135,7 @@
         <div id="detailDiv" class="detaildecision" 
             :style ="detaildecision" 
             >
-            <div>
+            <div id="side_div">
                 <el-table
                     :data="manualrules"
                     style="width: 100%;background-color:transparent !important;margin-left: 120px;
@@ -173,6 +173,7 @@
     margin-top: 60px;"
                      @cell-mouse-enter="table_hover"
                      @row-click="show_trace"
+                     id="table_decision"
                     >
                     <el-table-column
                         prop="timestamp"
@@ -321,7 +322,7 @@ export default {
             this.decisionDetail.urgent=row.event_info.maturity;
          },
          show_trace:function(){
-            this.dialogShowTrace=true;
+            //this.dialogShowTrace=true;
 
             var width = 800, height = 460;
             
@@ -334,7 +335,11 @@ export default {
                 .avoidOverlaps(true)
                 .size([width, height]);
 
-            var svg = d3.select('.svg_trace');
+            var svg = d3.select("#side_div").append("svg:svg")
+                .attr("width", width)
+                .attr("height", height);
+
+
             
             var graph={
                 "nodes":[
@@ -510,7 +515,7 @@ export default {
 }
 
 .label {
-    fill: black;
+    fill: gray;
     font-family: Verdana;
     font-size: 11px;
     text-anchor: start;
