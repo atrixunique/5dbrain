@@ -1,32 +1,85 @@
-
-//<template>
+<template>
     <el-main>
         <div class="asideimage" :style ="asideimage">
-            <div style="height:125px"></div>
+            <div style="height:208px"></div>
+            <div id="detailsArea">
+                <section id="generalDetails">
+                      <div style="display:none">
+                        <h1 id="title"></h1>
+                        <span><a id="about" href=""></a></span>
+                        <h5>Version: <span id="version"></span></h5>
+                        <h5>Author(s): <span id="authors"></span></h5>
+                        <h5>
+                            <label>Language: <select id="language" name="language" size="1"></select></label>
+                        </h5>
+                        <h3 class="accordion-trigger noselect accordion-trigger-active">Description</h3>
+                        <div class="accordion-container scrollable">
+                            <p id="description"></p>
+                        </div>
+                        <h3 class="accordion-trigger noselect">Metadata</h3>
+                        <div id="ontology-metadata" class="accordion-container"></div>
+                        <h3 class="accordion-trigger noselect">Statistics</h3>
+                    </div>
+                    <div class="accordion-container" style="display:none">
+                        <p class="statisticDetails">Classes: <span id="classCount"></span></p>
+                        <p class="statisticDetails">Object prop.: <span id="objectPropertyCount"></span></p>
+                        <p class="statisticDetails">Datatype prop.: <span id="datatypePropertyCount"></span></p>
+                        <div class="small-whitespace-separator"></div>
+                        <p class="statisticDetails">Individuals: <span id="individualCount"></span></p>
+                        <div class="small-whitespace-separator"></div>
+                        <p class="statisticDetails">Nodes: <span id="nodeCount"></span></p>
+                        <p class="statisticDetails">Edges: <span id="edgeCount"></span></p>
+                    </div>
 
+
+                    <h3 class="accordion-trigger noselect" id="selection-details-trigger">Selection Details</h3>
+                    <div class="accordion-container" id="selection-details">
+                        <div id="classSelectionInformation" class="hidden">
+                            <p class="propDetails">Name: <span id="name"></span></p>
+                            <p class="propDetails">Type: <span id="typeNode"></span></p>
+                            <p class="propDetails">Equiv.: <span id="classEquivUri"></span></p>
+                            <p class="propDetails">Disjoint: <span id="disjointNodes"></span></p>
+                            <p class="propDetails">Charac.: <span id="classAttributes"></span></p>
+                            <p class="propDetails">Individuals: <span id="individuals"></span></p>
+                            <p class="propDetails">Description: <span id="nodeDescription"></span></p>
+                            <p class="propDetails">Comment: <span id="nodeComment"></span></p>
+                        </div>
+                        <div id="propertySelectionInformation" class="hidden">
+                            <p class="propDetails">Name: <span id="propname"></span></p>
+                            <p class="propDetails">Type: <span id="typeProp"></span></p>
+                            <p id="inverse" class="propDetails">Inverse: <span></span></p>
+                            <p class="propDetails">Domain: <span id="domain"></span></p>
+                            <p class="propDetails">Range: <span id="range"></span></p>
+                            <p class="propDetails">Subprop.: <span id="subproperties"></span></p>
+                            <p class="propDetails">Superprop.: <span id="superproperties"></span></p>
+                            <p class="propDetails">Equiv.: <span id="propEquivUri"></span></p>
+                            <p id="infoCardinality" class="propDetails">Cardinality: <span></span></p>
+                            <p id="minCardinality" class="propDetails">Min. cardinality: <span></span></p>
+                            <p id="maxCardinality" class="propDetails">Max. cardinality: <span></span></p>
+                            <p class="propDetails">Charac.: <span id="propAttributes"></span></p>
+                            <p class="propDetails">Description: <span id="propDescription"></span></p>
+                            <p class="propDetails">Comment: <span id="propComment"></span></p>
+                        </div>
+                        <div id="noSelectionInformation">
+                            <p><span>Select an element in the visualization.</span></p>
+                        </div>
+                    </div>
+                </section>
+            </div>
 
 
         </div>
+
         <div class="ribbonimage" :style ="ribbonimage" style="text-align:left;">
-            <span style="position:relative;top:60px;left:40px;padding-right:140px;">知识管理包括几个方面，即IP路径库管理、漏洞信息管理和事件指纹管理。 <br/>
-            <span style="font-size:80%;color:#999">Knowledge management contains several parts.e.g.</span></span>
+            <div style="position:relative;top:20px;left:40px;font-size:20px;font-weight:bold">知识管理</div>
+            <span style="position:relative;top:35px;left:65px;display:block;padding-right:80px;">知识管理包括几个方面，即IP路径库管理、漏洞信息管理和事件指纹管理。
+            <br/>
+            <span style="font-size:80%;color:#999;">
+            Knowledge management contains several parts.e.g. IP path management, vulnerability management and event fingerprint management</span></span>
         </div>
 
 
-        <!--
-        <div class="containerEntity" :style ="entitybackground">
-
-            <img src="./assets/images/fake-chart.png" width=340 style="position:absolute;top:310px;left:1000px;">
-
-        </div>
-        -->
-
-
-         <div style="position:absolute;width:1200px;height:290px;left:354px;top:310px;">
-               
-        </div>
-
-        <div class="mainDiv">
+        <div class="graphMainDiv">
            <section id="canvasArea">
            
 
@@ -162,70 +215,12 @@
                 <p class="noselect" id="zoomOutButton">-</p>
             </div>
         </section>
-            <div id="detailsArea" style="display:none;">
-                <section id="generalDetails">
-                    <h1 id="title"></h1>
-                    <span><a id="about" href=""></a></span>
-                    <h5>Version: <span id="version"></span></h5>
-                    <h5>Author(s): <span id="authors"></span></h5>
-                    <h5>
-                        <label>Language: <select id="language" name="language" size="1"></select></label>
-                    </h5>
-                    <h3 class="accordion-trigger noselect accordion-trigger-active">Description</h3>
-                    <div class="accordion-container scrollable">
-                        <p id="description"></p>
-                    </div>
-                    <h3 class="accordion-trigger noselect">Metadata</h3>
-                    <div id="ontology-metadata" class="accordion-container"></div>
-                    <h3 class="accordion-trigger noselect">Statistics</h3>
-                    <div class="accordion-container">
-                        <p class="statisticDetails">Classes: <span id="classCount"></span></p>
-                        <p class="statisticDetails">Object prop.: <span id="objectPropertyCount"></span></p>
-                        <p class="statisticDetails">Datatype prop.: <span id="datatypePropertyCount"></span></p>
-                        <div class="small-whitespace-separator"></div>
-                        <p class="statisticDetails">Individuals: <span id="individualCount"></span></p>
-                        <div class="small-whitespace-separator"></div>
-                        <p class="statisticDetails">Nodes: <span id="nodeCount"></span></p>
-                        <p class="statisticDetails">Edges: <span id="edgeCount"></span></p>
-                    </div>
-                    <h3 class="accordion-trigger noselect" id="selection-details-trigger">Selection Details</h3>
-                    <div class="accordion-container" id="selection-details">
-                        <div id="classSelectionInformation" class="hidden">
-                            <p class="propDetails">Name: <span id="name"></span></p>
-                            <p class="propDetails">Type: <span id="typeNode"></span></p>
-                            <p class="propDetails">Equiv.: <span id="classEquivUri"></span></p>
-                            <p class="propDetails">Disjoint: <span id="disjointNodes"></span></p>
-                            <p class="propDetails">Charac.: <span id="classAttributes"></span></p>
-                            <p class="propDetails">Individuals: <span id="individuals"></span></p>
-                            <p class="propDetails">Description: <span id="nodeDescription"></span></p>
-                            <p class="propDetails">Comment: <span id="nodeComment"></span></p>
-                        </div>
-                        <div id="propertySelectionInformation" class="hidden">
-                            <p class="propDetails">Name: <span id="propname"></span></p>
-                            <p class="propDetails">Type: <span id="typeProp"></span></p>
-                            <p id="inverse" class="propDetails">Inverse: <span></span></p>
-                            <p class="propDetails">Domain: <span id="domain"></span></p>
-                            <p class="propDetails">Range: <span id="range"></span></p>
-                            <p class="propDetails">Subprop.: <span id="subproperties"></span></p>
-                            <p class="propDetails">Superprop.: <span id="superproperties"></span></p>
-                            <p class="propDetails">Equiv.: <span id="propEquivUri"></span></p>
-                            <p id="infoCardinality" class="propDetails">Cardinality: <span></span></p>
-                            <p id="minCardinality" class="propDetails">Min. cardinality: <span></span></p>
-                            <p id="maxCardinality" class="propDetails">Max. cardinality: <span></span></p>
-                            <p class="propDetails">Charac.: <span id="propAttributes"></span></p>
-                            <p class="propDetails">Description: <span id="propDescription"></span></p>
-                            <p class="propDetails">Comment: <span id="propComment"></span></p>
-                        </div>
-                        <div id="noSelectionInformation">
-                            <p><span>Select an element in the visualization.</span></p>
-                        </div>
-                    </div>
-                </section>
-            </div>
+            
         </div>
         
     </el-main>
 </template>
+
 
 <script>
 import Vue from 'vue';
@@ -233,7 +228,10 @@ import Mock from 'mockjs';
 import axios from 'axios';
 
 import {getServiceIP, mockAll} from './mockdata.js';
-//import * as d3 from './assets/js/d3.min.js';
+
+import './assets/js/d3.min.js';
+import './assets/js/webvowl.js';
+import './assets/js/webvowl.app.js';
 
 Vue.component('node-item', {
   data() {
@@ -251,13 +249,12 @@ export default {
             nodes:[],
             events:[],
             ribbonimage: {
-                backgroundImage: "url("+require("./assets/images/ribbon-info.png") + ")",
+                backgroundImage: "url("+require("./assets/images/ribbon.png") + ")",
                 position:"absolute",
                 left:"324px",
                 top:"158px",
-                width:"1586px",
-                height:"151px",
-                backgroundRepeat:"no-repeat"
+                width:"1257px",
+                height:"153px"
             },
             entitybackground: {
                 backgroundImage: "url("+require("./assets/images/animated-turbine.gif") + ")",
@@ -291,8 +288,8 @@ export default {
         var self=this;
         mockAll();
 
-        //webvowl.app().initialize();
 
+        webvowl.app().initialize();
         
     }
 }

@@ -101,7 +101,8 @@
             <div>
                 <img src="./assets/images/new-container.png" width=340 style="cursor:pointer" @click="dialogNewContainerVisible=true"/>
             </div>
-        </div>
+        </div>  <!-- End of aside-image -->
+
         <!-- Detail info listed for a certain container -->
         <div id="detailDiv" class="detailimage" :style ="detailimage">
         </div>
@@ -119,6 +120,7 @@
 
                      
         </div>
+        
         <img v-for="(node, index) in nodes"
             class="isometric-node" 
             v-bind:id="'LN'+index"

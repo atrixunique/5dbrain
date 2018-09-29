@@ -126,7 +126,7 @@ export default {
 
     var sockJS= require('./assets/js/sockjs.min.js');
     var Stomp = require("./assets/js/stomp.min.js").Stomp;
-    var isconn= true;
+    var isconn= false;
 
     
     if(isconn) {

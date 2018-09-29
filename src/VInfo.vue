@@ -334,12 +334,22 @@ export default {
             self.nodes=response.data.result;
         });
 
-        axios.get(getServiceIP()+"/logger/searchfirewall").then(function(response){    
-            self.totalItem=response.data.pageCount*30;
+
+        axios.defaults.headers.post['Content-Type'] = 'application/json';
+        axios({
+                method: 'post',
+                url:getServiceIP()+"/logger/searchfirewall",
+                data:'{currentPage:1, pageSize:50}'
+        }).then(function(response){    
+            self.totalItem=response.data.pageCount*50;
             self.firewallMongoLogger=response.data.firewallMongoLogger;
         });
 
-        axios.get(getServiceIP()+"/logger/searchconpot").then(function(response){
+        axios({
+                method: 'post',
+                url:getServiceIP()+"/logger/searchconpot",
+                data:'{currentPage:1, pageSize:50}'
+        }).then(function(response){    
             self.conpotMongoLogger=response.data.conpotMongoLogger;
         });
         

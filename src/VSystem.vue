@@ -193,11 +193,14 @@ export default {
         var self=this;
         mockAll();
 
-       axios.get(getServiceIP()+"/logger/searchlog").then(function(response){    
-            //debugger;
+        axios.defaults.headers.post['Content-Type'] = 'application/json';
+        axios({
+                method: 'post',
+                url:getServiceIP()+"/logger/searchlog",
+                data:'{currentPage:1, pageSize:50}'
+        }).then(function(response){
             self.visitlogs=response.data.appfirewallMongoLogger;
         });
-
         
     }
 }

@@ -148,7 +148,7 @@
                         width="100">
                         <template slot-scope="scope">
                             <el-switch
-                                    size="small"
+                                    size="mini"
                                     v-model="enableRule[scope.$index]"
                                     active-text="启用">
                             </el-switch>
@@ -259,7 +259,7 @@ export default {
                 backgroundImage: "url("+require("./assets/images/entity-decision.png") + ")",
                 left:"380px",
                 top:"330px",
-                width:"1500px",
+                width:"800px",
                 height:"694px",
                 backgroundRepeat:"no-repeat",
                 backgroundPosition:"0px 45px"
@@ -313,15 +313,18 @@ export default {
         
         this.$root.eventHub.$emit('command-log', {text: "Decision Management Interface", type: "info"});
 
-        axios.get(getServiceIP()+"/logger/searchdecision").then(function(response){
+        axios.defaults.headers.post['Content-Type'] = 'application/json';
+        axios({
+                method: 'post',
+                url:getServiceIP()+"/logger/searchdecision",
+                data:'{currentPage:1, pageSize:50}'
+        }).then(function(response){
             self.appfirewallMongoLogger=response.data.appfirewallMongoLogger;
         });
         
     }
     
  }
-
-
 
 </script> 
 
@@ -382,6 +385,19 @@ export default {
     opacity: 0.7;
 }
 .current-row td{background-color:#3b629e !important;opacity:0.8;}
+
+.el-switch__core {
+    height: 12px;
+    border-radius: 12px;
+}
+.el-switch.is-checked .el-switch__core::after {
+    margin-left: -11px;
+}
+.el-switch__core:after {
+    top:0px;
+    width: 11px;
+    height: 11px;
+}
 </style>
 
 

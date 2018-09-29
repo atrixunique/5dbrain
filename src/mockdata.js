@@ -4,6 +4,7 @@ import searchconpot from './mock/searchconpot.json';
 import searchmonitor from './mock/searchmonitor.json';
 import searchdecision from './mock/searchdecision.json';
 import searchlog from './mock/searchlog.json';
+import foaf from './mock/foaf.json';
 
 function getServiceIP()
 {
@@ -12,7 +13,12 @@ function getServiceIP()
 
 function mockAll()
 {
-    return;
+    
+    
+    console.log("[hahaha]"+searchconpot);
+    Mock.mock("http://10.42.0.220/mock/foaf", foaf);
+    
+    //return;
     Mock.mock(getServiceIP() + "getImageList", {
         body: [
             {
