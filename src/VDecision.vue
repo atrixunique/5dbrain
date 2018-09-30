@@ -1,7 +1,11 @@
 <template>
     <el-main>
-         <el-dialog title="路径回溯" :visible.sync="dialogShowTrace" width="60%">
-            <div class="div_trace" style="width:100%;height:300px;border:1px solid gray">
+         <el-dialog title="路径回溯" 
+            :visible.sync="dialogShowTrace" 
+            width="60%"
+            >
+            <p style="margin:0 0 5px 0;color:white;">从攻击者到受害者的路径，经过知识库推理计算得出</p>
+            <div id="divTrace" class="div_trace" style="width:100%;height:300px;border-top:1px solid  #2560c7">
                 
             </div>
 
@@ -172,7 +176,7 @@
                     style="width: 100%;background-color:transparent !important;margin-left: 20px;
     margin-top: 60px;"
                      @cell-mouse-enter="table_hover"
-                     @row-click="show_trace"
+                     @row-click="show_dialog"
                      id="table_decision"
                     >
                     <el-table-column
@@ -321,25 +325,34 @@ export default {
             this.decisionDetail.result=row.event_info.attack_category;
             this.decisionDetail.urgent=row.event_info.maturity;
          },
+         show_dialog:function(){
+             var self=this;
+             this.dialogShowTrace=true;
+             setTimeout(() => {
+                self.show_trace();
+             },0);
+         },
          show_trace:function(){
-            //this.dialogShowTrace=true;
+            this.dialogShowTrace=true;
 
-            var width = 800, height = 460;
+            var width = 600, height = 300;
             
             var d3= require('./assets/js/d3v4.js');
             var cola= require('./assets/js/cola.min.js');
 
             var color = d3.scaleOrdinal(d3.schemeCategory20);
             var cola = cola.d3adaptor(d3)
-                .linkDistance(100)
+                .linkDistance(30)
                 .avoidOverlaps(true)
                 .size([width, height]);
 
-            var svg = d3.select("#side_div").append("svg:svg")
+            d3.selectAll("svg").remove();
+            
+            var svg = d3.select("#divTrace").append("svg")
                 .attr("width", width)
-                .attr("height", height);
-
-
+                .attr("height", height)
+                .attr("left",0)
+                .attr("top",0);
             
             var graph={
                 "nodes":[
@@ -472,6 +485,20 @@ export default {
     color:black;
     font-family:微软雅黑;}
 
+.el-dialog { 
+    background: #031029;
+    opacity: 0.8;
+    border: 1px solid #2560c7;}
+.el-dialog__title{
+    color:white;
+}
+.el-dialog__header {
+    background-color: #002f67;
+    opacity: 0.7;
+}
+.el-dialog__body {
+    padding:10px 5px;
+}
 
 .el-table--border::after, .el-table--group::after, .el-table::before { background-color: transparent !important;}
 .el-table tr, .el-table th, .cell {
@@ -502,6 +529,12 @@ export default {
     height: 11px;
 }
 
+svg
+{
+    position:absolute;
+    top:130px;
+    left:0px;
+}
 .node 
 {
     stroke: #fff;
